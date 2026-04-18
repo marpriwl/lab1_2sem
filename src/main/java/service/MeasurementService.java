@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 public class MeasurementService {
     private final TreeMap<Long, Measurement> measurements = new TreeMap<>();
     private final SampleService sampleService;
-    private long nextId = 1;
 
     public MeasurementService(SampleService sampleService) {
         this.sampleService = sampleService;
@@ -26,7 +25,7 @@ public class MeasurementService {
         }
         MeasurementValidator.validate(value, unit, method);
 
-        long id = nextId++;
+        long id = IdGenerator.nextMeasurementId();
         Measurement m = new Measurement(id, sampleId, param, value, unit, method, "SYSTEM");
         measurements.put(id, m);
         return id;
