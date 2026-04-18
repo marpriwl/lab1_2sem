@@ -9,10 +9,11 @@ import java.util.stream.Collectors;
 
 public class SampleService {
     private final TreeMap<Long, Sample> samples = new TreeMap<>();
+    private final IdGenerator idGenerator = new IdGenerator();
 
     public long add(String name, String type, String location) {
         SampleValidator.validate(name, type, location);
-        long id = IdGenerator.nextSampleId();
+        long id = idGenerator.nextId();
         Sample sample = new Sample(id, name, type, location, SampleStatus.ACTIVE, "SYSTEM");
         samples.put(id, sample);
         return id;

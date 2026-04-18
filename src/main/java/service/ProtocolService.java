@@ -11,10 +11,11 @@ import java.util.stream.Collectors;
 
 public class ProtocolService {
     private final TreeMap<Long, Protocol> protocols = new TreeMap<>();
+    private final IdGenerator idGenerator = new IdGenerator();
 
     public long create(String name, Set<MeasurementParam> params) {
         ProtocolValidator.validate(name, params);
-        long id = IdGenerator.nextProtocolId();
+        long id = idGenerator.nextId();
         Protocol p = new Protocol(id, name, params, "SYSTEM");
         protocols.put(id, p);
         return id;
