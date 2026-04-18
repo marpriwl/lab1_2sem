@@ -17,7 +17,7 @@ public class LabCli {
     private final Scanner scanner = new Scanner(System.in);
 
     public void start() {
-        System.out.println("Лабораторная 1 — Образцы и измерения (TreeMap). Введи help для списка команд.");
+        System.out.println("Введите help для списка команд.");
         while (true) {
             System.out.print("> ");
             String line = scanner.nextLine().trim();
@@ -58,21 +58,20 @@ public class LabCli {
     private void printHelp() {
         System.out.println("""
                 Команды:
-                sample_add                  — создать образец (интерактивно)
-                sample_list [--status ACTIVE|ARCHIVED]
-                sample_show <id>
-                sample_update <id> field=value ...
-                sample_archive <id>
-                meas_add <sample_id>        — добавить измерение (интерактивно)
-                meas_list <sample_id> [--param PH|...] [--last N]
-                meas_stats <sample_id> <param>
-                prot_create                 — создать протокол (интерактивно)
-                prot_apply <protocol_id> <sample_id>
+                sample_add  — создать образец 
+                sample_list — вывести список образцов
+                sample_show <id> — показать карточку образца 
+                sample_update <id> field=value — поменять параметр образца
+                sample_archive <id> — добавить образец в архив (Будьте внимательны, после этой команды изменения образца не могут быть произведены)
+                meas_add <sample_id>  — добавить измерение 
+                meas_list <sample_id> [--param PH|...] [--last N] — показать измерения образца (N — номер измерения)
+                meas_stats <sample_id> <param> — показать статистику по параметру измерения 
+                prot_create  — создать протокол 
+                prot_apply <protocol_id> <sample_id> — проверить выполнен ли протокол для образца 
                 help / exit
                 """);
     }
 
-    // ==================== SAMPLE ====================
     private void sampleAdd() {
         System.out.print("Название: ");
         String name = scanner.nextLine().trim();
@@ -122,7 +121,6 @@ public class LabCli {
         System.out.println("OK sample " + id + " archived");
     }
 
-    // ==================== MEAS ====================
     private void measAdd(String[] parts) {
         if (parts.length < 2) throw new IllegalArgumentException("нужен sample_id");
         long sampleId = Long.parseLong(parts[1]);
@@ -164,7 +162,6 @@ public class LabCli {
         System.out.println(measurementService.stats(sampleId, param));
     }
 
-    // ==================== PROTOCOL ====================
     private void protCreate() {
         System.out.print("Название протокола: ");
         String name = scanner.nextLine().trim();
