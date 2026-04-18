@@ -25,15 +25,23 @@ public class SampleService {
     }
 
     public String list(String statusFilter) {
-        var list = samples.values().stream();
+        var stream = samples.values().stream();
+
         if (statusFilter != null) {
             SampleStatus st = SampleStatus.valueOf(statusFilter.toUpperCase());
-            list = list.filter(s -> s.getStatus() == st);
+            stream = stream.filter(s -> s.getStatus() == st);
         }
-        if (list.toList().isEmpty()) return "Нет образцов";
-        return list.map(s -> String.format("%-4d %-20s %-10s %-15s %s",
+
+        var result = stream.toList();
+
+        if (result.isEmpty()) {
+            return "Нет образцов";
+        }
+
+        return result.stream()
+                .map(s -> String.format("%-4d %-20s %-10s %-15s %s",
                         s.getId(), s.getName(), s.getType(), s.getLocation(), s.getStatus()))
-                .collect(Collectors.joining("\n"));
+                .collect(java.util.stream.Collectors.joining("\n"));
     }
 
     public void update(long id, String field, String value) {
