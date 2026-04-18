@@ -27,7 +27,6 @@ public class MeasurementService {
         MeasurementValidator.validate(value, unit, method);
 
         long id = nextId++;
-        // ✅ Правильный вызов конструктора (7 параметров)
         Measurement m = new Measurement(id, sampleId, param, value, unit, method, "SYSTEM");
         measurements.put(id, m);
         return id;
