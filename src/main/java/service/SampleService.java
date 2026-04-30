@@ -69,5 +69,16 @@ public class SampleService {
         s.updateTimestamp();
     }
 
+    public void replaceAll(TreeMap<Long, Sample> loadedSamples) {
+        samples.clear();
+        samples.putAll(loadedSamples);
+
+        long nextId = samples.isEmpty()
+                ? 1
+                : samples.lastKey() + 1;
+
+        idGenerator.setNextId(nextId);
+    }
+
     public TreeMap<Long, Sample> getAll() { return samples; }
 }

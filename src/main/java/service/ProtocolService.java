@@ -39,5 +39,16 @@ public class ProtocolService {
         return "Missing params: " + missing.stream().map(Enum::name).collect(Collectors.joining(", "));
     }
 
+    public void replaceAll(TreeMap<Long, Protocol> loadedProtocols) {
+        protocols.clear();
+        protocols.putAll(loadedProtocols);
+
+        long nextId = protocols.isEmpty()
+                ? 1
+                : protocols.lastKey() + 1;
+
+        idGenerator.setNextId(nextId);
+    }
+
     public TreeMap<Long, Protocol> getAll() { return protocols; }
 }

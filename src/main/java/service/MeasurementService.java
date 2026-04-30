@@ -61,5 +61,16 @@ public class MeasurementService {
         return String.format("count: %d%nmin: %.3f%nmax: %.3f%navg: %.3f", list.size(), min, max, avg);
     }
 
+    public void replaceAll(TreeMap<Long, Measurement> loadedMeasurements) {
+        measurements.clear();
+        measurements.putAll(loadedMeasurements);
+
+        long nextId = measurements.isEmpty()
+                ? 1
+                : measurements.lastKey() + 1;
+
+        idGenerator.setNextId(nextId);
+    }
+
     public TreeMap<Long, Measurement> getAll() { return measurements; }
 }
