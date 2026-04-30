@@ -12,6 +12,9 @@ public final class Sample {
     private Instant createdAt;
     private Instant updatedAt;
 
+    public Sample() {
+    }
+
     public Sample(long id, String name, String type, String location,
                   SampleStatus status, String ownerUsername) {
         this.id = id;
@@ -24,18 +27,43 @@ public final class Sample {
         this.updatedAt = Instant.now();
     }
 
+
     public long getId() { return id; }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getName() { return name; }
+
     public void setName(String name) { this.name = name; }
+
     public String getType() { return type; }
+
     public void setType(String type) { this.type = type; }
+
     public String getLocation() { return location; }
+
     public void setLocation(String location) { this.location = location; }
+
     public SampleStatus getStatus() { return status; }
+
     public void setStatus(SampleStatus status) { this.status = status; }
+
     public String getOwnerUsername() { return ownerUsername; }
+
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
+
     public Instant getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Instant getUpdatedAt() { return updatedAt; }
+
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 
     public void updateTimestamp() {

@@ -14,6 +14,9 @@ public final class Measurement {
     private Instant createdAt;
     private Instant updatedAt;
 
+    public Measurement() {
+    }
+
     public Measurement(long id, long sampleId, MeasurementParam param, double value,
                        String unit, String method,  String ownerUsername) {
         this.id = id;
@@ -38,4 +41,44 @@ public final class Measurement {
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
     public void updateTimestamp() { this.updatedAt = Instant.now(); }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setSampleId(long sampleId) {
+        this.sampleId = sampleId;
+    }
+
+    public void setParam(MeasurementParam param) {
+        this.param = param;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setMeasuredAt(Instant measuredAt) {
+        this.measuredAt = measuredAt;
+    }
+
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
