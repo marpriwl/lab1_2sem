@@ -16,6 +16,8 @@ import cli.command.SampleUpdateCommand;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
+import cli.command.SaveCommand;
+import cli.command.LoadCommand;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,6 +47,8 @@ public class LabCli {
         register(new MeasStatsCommand());
         register(new ProtCreateCommand());
         register(new ProtApplyCommand());
+        register(new SaveCommand());
+        register(new LoadCommand());
     }
 
     public void start() {
