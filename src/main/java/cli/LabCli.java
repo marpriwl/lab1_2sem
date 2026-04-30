@@ -13,15 +13,27 @@ import cli.command.SampleArchiveCommand;
 import cli.command.SampleListCommand;
 import cli.command.SampleShowCommand;
 import cli.command.SampleUpdateCommand;
+import cli.command.SaveCommand;
+import cli.command.LoadCommand;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
-import cli.command.SaveCommand;
-import cli.command.LoadCommand;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+import domain.Measurement;
+import domain.Protocol;
+import domain.Sample;
+import storage.FileStorage;
+import storage.FileValidator;
+import storage.LabData;
+
+import java.nio.file.Path;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class LabCli {
     private final SampleService sampleService = new SampleService();
@@ -35,8 +47,23 @@ public class LabCli {
     private final Map<String, CliCommand> commands = new LinkedHashMap<>();
 
     public LabCli() {
+        registerCommands();
+    }
+
+    public LabCli(String[] args) {
+        registerCommands();
+
+        if (args != null && args.length > 0) {
+            loadAtStartup(args[0]);
+        }
+    }
+
+    private void registerCommands() {
         register(new HelpCommand(() -> commands.values()));
         register(new ExitCommand());
+        register(new SaveCommand());
+        register(new LoadCommand());
+
         register(new SampleAddCommand());
         register(new SampleListCommand());
         register(new SampleShowCommand());
@@ -47,8 +74,49 @@ public class LabCli {
         register(new MeasStatsCommand());
         register(new ProtCreateCommand());
         register(new ProtApplyCommand());
-        register(new SaveCommand());
-        register(new LoadCommand());
+    }
+
+    private void loadAtStartup(String filePath) {
+        try {
+            FileStorage fileStorage = new FileStorage();
+            FileValidator fileValidator = new FileValidator();
+
+            LabData data = fileStorage.load(Path.of(filePath));
+            fileValidator.validate(data);
+
+            TreeMap<Long, Sample> samples = data.getSamples().stream()
+                    .collect(Collectors.toMap(
+                            Sample::getId,
+                            Function.identity(),
+                            (a, b) -> a,
+                            TreeMap::new
+                    ));
+
+            TreeMap<Long, Measurement> measurements = data.getMeasurements().stream()
+                    .collect(Collectors.toMap(
+                            Measurement::getId,
+                            Function.identity(),
+                            (a, b) -> a,
+                            TreeMap::new
+                    ));
+
+            TreeMap<Long, Protocol> protocols = data.getProtocols().stream()
+                    .collect(Collectors.toMap(
+                            Protocol::getId,
+                            Function.identity(),
+                            (a, b) -> a,
+                            TreeMap::new
+                    ));
+
+            sampleService.replaceAll(samples);
+            measurementService.replaceAll(measurements);
+            protocolService.replaceAll(protocols);
+
+            System.out.println("OK loaded from " + filePath);
+        } catch (Exception e) {
+            System.out.println("Ошибка автозагрузки: " + e.getMessage());
+            System.out.println("Программа запущена без загруженных данных.");
+        }
     }
 
     public void start() {
