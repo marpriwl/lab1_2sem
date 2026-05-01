@@ -14,6 +14,11 @@ import javafx.stage.Stage;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 public class LabApplication extends Application {
 
@@ -49,11 +54,14 @@ public class LabApplication extends Application {
         );
         topPanel.setPadding(new Insets(0, 0, 12, 0));
 
+        Button addSampleButton = new Button("Add Sample");
+        addSampleButton.setOnAction(event -> showAddSampleDialog());
+
         Button refreshButton = new Button("Refresh");
         refreshButton.setOnAction(event -> refreshSamples());
 
         HBox actionsPanel = new HBox(10);
-        actionsPanel.getChildren().addAll(refreshButton);
+        actionsPanel.getChildren().addAll(addSampleButton, refreshButton);
         actionsPanel.setPadding(new Insets(0, 0, 12, 0));
 
         VBox topContainer = new VBox(8);
@@ -75,6 +83,61 @@ public class LabApplication extends Application {
         stage.setTitle("Lab Manager");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void showAddSampleDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Add Sample");
+        dialog.setHeaderText("Create new sample");
+
+        TextField nameField = new TextField();
+        nameField.setPromptText("Name");
+
+        TextField typeField = new TextField();
+        typeField.setPromptText("Type");
+
+        TextField locationField = new TextField();
+        locationField.setPromptText("Location");
+
+        GridPane form = new GridPane();
+        form.setHgap(10);
+        form.setVgap(10);
+        form.setPadding(new Insets(10));
+
+        form.add(new Label("Name:"), 0, 0);
+        form.add(nameField, 1, 0);
+
+        form.add(new Label("Type:"), 0, 1);
+        form.add(typeField, 1, 1);
+
+        form.add(new Label("Location:"), 0, 2);
+        form.add(locationField, 1, 2);
+
+        dialog.getDialogPane().setContent(form);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try {
+                    String name = nameField.getText().trim();
+                    String type = typeField.getText().trim();
+                    String location = locationField.getText().trim();
+
+                    sampleService.add(name, type, location);
+                    refreshSamples();
+                } catch (Exception e) {
+                    showError(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Operation failed");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void refreshSamples() {
