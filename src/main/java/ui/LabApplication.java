@@ -15,6 +15,7 @@ import ui.sample.SamplePanel;
 
 import ui.measurement.MeasurementPanel;
 import ui.protocol.ProtocolPanel;
+import ui.storage.StorageDialogs;
 
 
 public class LabApplication extends Application {   //Application — базовый класс JavaFX-приложения.
@@ -57,6 +58,30 @@ public class LabApplication extends Application {   //Application — базов
         samplesButton.setOnAction(event -> root.setCenter(samplePanel));
         measurementsButton.setOnAction(event -> root.setCenter(measurementPanel));
         protocolsButton.setOnAction(event -> root.setCenter(protocolPanel));
+
+
+        saveButton.setOnAction(event ->
+                StorageDialogs.showSaveDialog(
+                        stage,
+                        sampleService,
+                        measurementService,
+                        protocolService
+                )
+        );
+
+        loadButton.setOnAction(event ->
+                StorageDialogs.showLoadDialog(
+                        stage,
+                        sampleService,
+                        measurementService,
+                        protocolService,
+                        () -> {
+                            samplePanel.refresh();
+                            measurementPanel.refresh();
+                            protocolPanel.refresh();
+                        }
+                )
+        );
 
         root.setTop(topPanel); //положить topPanel в верхнюю часть окна
         root.setCenter(samplePanel); //Эта строка кладёт экран образцов в центральную часть окна.

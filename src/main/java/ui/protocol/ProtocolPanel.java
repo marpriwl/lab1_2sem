@@ -80,4 +80,8 @@ public class ProtocolPanel extends VBox {
             cardsBox.getChildren().add(card);
         }
     }
+
+    public void refresh() {
+        refreshProtocols();
+    }
 }

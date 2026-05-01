@@ -62,4 +62,8 @@ public class MeasurementPanel extends VBox {
             cardsBox.getChildren().add(card);
         }
     }
+
+    public void refresh() {
+        refreshMeasurements();
+    }
 }
