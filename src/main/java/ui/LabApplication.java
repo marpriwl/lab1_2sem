@@ -52,7 +52,7 @@ public class LabApplication extends Application {   //Application — базов
 
         SamplePanel samplePanel = new SamplePanel(sampleService); //create SamplePanel — это отдельный JavaFX-блок, который отвечает за экран образцов.
         MeasurementPanel measurementPanel = new MeasurementPanel(measurementService);
-        ProtocolPanel protocolPanel = new ProtocolPanel(protocolService);
+        ProtocolPanel protocolPanel = new ProtocolPanel(protocolService, measurementService);
 
         samplesButton.setOnAction(event -> root.setCenter(samplePanel));
         measurementsButton.setOnAction(event -> root.setCenter(measurementPanel));
