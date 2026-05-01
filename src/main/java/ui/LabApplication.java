@@ -16,6 +16,7 @@ import service.ProtocolService;
 import service.SampleService;
 
 import ui.sample.SampleDialogs;
+import ui.sample.SampleCardFactory;
 
 public class LabApplication extends Application {   //Application — базовый класс JavaFX-приложения.
 
@@ -23,10 +24,14 @@ public class LabApplication extends Application {   //Application — базов
     private final MeasurementService measurementService = new MeasurementService(sampleService);
     private final ProtocolService protocolService = new ProtocolService();
 
+    private SampleCardFactory sampleCardFactory;
+
     private VBox cardsBox;  //VBox — это вертикальный контейнер JavaFX. Он размещает элементы сверху вниз. СardsBox нужен, чтобы хранить карточки
 
     @Override
     public void start(Stage stage) {  //Если класс наследуется от Application, JavaFX ожидает, что в нём будет метод: start(Stage stage). Это главный метод JavaFX. Он вызывается автоматически при запуске приложения. Stage — это главное окно.
+
+        sampleCardFactory = new SampleCardFactory(sampleService, this::refreshSamples);
 
         BorderPane root = new BorderPane(); //BorderPane — контейнер с зонами.
         root.setPadding(new Insets(12)); //Добавляет внутренний отступ 12 px со всех сторон.
@@ -53,7 +58,7 @@ public class LabApplication extends Application {   //Application — базов
         topPanel.setPadding(new Insets(0, 0, 12, 0)); //Добавляет отступ. Формат: new Insets(top, right, bottom, left).
 
         Button addSampleButton = new Button("Add Sample"); //Создается кнопка Add Sample.
-        addSampleButton.setOnAction(event ->  //setOnAction(...) задаёт действие при нажатии (вызывается метод showAddSampleDialog()).
+        addSampleButton.setOnAction(event ->  // setOnAction(...) задаёт действие при нажатии: открывается диалог добавления образца.
                 SampleDialogs.showAddSampleDialog(sampleService, this::refreshSamples)
         );
 
@@ -95,47 +100,9 @@ public class LabApplication extends Application {   //Application — базов
         }
 
         for (Sample sample : sampleService.getAll().values()) {
-            VBox card = createSampleCard(sample);
+            VBox card = sampleCardFactory.createSampleCard(sample);
             cardsBox.getChildren().add(card);
         }
-    }
-
-    private VBox createSampleCard(Sample sample) {
-        VBox card = new VBox(6);
-        card.setPadding(new Insets(12));
-        card.setStyle(
-                "-fx-border-color: #cccccc;" +
-                        "-fx-border-radius: 8;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-background-color: #f8f8f8;"
-        );
-
-        Label title = new Label("Sample #" + sample.getId());
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        Label name = new Label("name: " + sample.getName());
-        Label type = new Label("type: " + sample.getType());
-        Label location = new Label("location: " + sample.getLocation());
-        Label status = new Label("status: " + sample.getStatus());
-        Label owner = new Label("owner: " + sample.getOwnerUsername());
-
-        HBox buttons = new HBox(8);
-        Button editButton = new Button("Edit");
-        Button archiveButton = new Button("Archive");
-
-        buttons.getChildren().addAll(editButton, archiveButton);
-
-        card.getChildren().addAll(
-                title,
-                name,
-                type,
-                location,
-                status,
-                owner,
-                buttons
-        );
-
-        return card;
     }
 
     public static void main(String[] args) {
