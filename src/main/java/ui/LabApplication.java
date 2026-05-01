@@ -13,6 +13,9 @@ import service.ProtocolService;
 import service.SampleService;
 import ui.sample.SamplePanel;
 
+import ui.measurement.MeasurementPanel;
+import ui.protocol.ProtocolPanel;
+
 
 public class LabApplication extends Application {   //Application — базовый класс JavaFX-приложения.
 
@@ -48,6 +51,12 @@ public class LabApplication extends Application {   //Application — базов
         topPanel.setPadding(new Insets(0, 0, 12, 0)); //Добавляет отступ. Формат: new Insets(top, right, bottom, left).
 
         SamplePanel samplePanel = new SamplePanel(sampleService); //create SamplePanel — это отдельный JavaFX-блок, который отвечает за экран образцов.
+        MeasurementPanel measurementPanel = new MeasurementPanel(measurementService);
+        ProtocolPanel protocolPanel = new ProtocolPanel(protocolService);
+
+        samplesButton.setOnAction(event -> root.setCenter(samplePanel));
+        measurementsButton.setOnAction(event -> root.setCenter(measurementPanel));
+        protocolsButton.setOnAction(event -> root.setCenter(protocolPanel));
 
         root.setTop(topPanel); //положить topPanel в верхнюю часть окна
         root.setCenter(samplePanel); //Эта строка кладёт экран образцов в центральную часть окна.
