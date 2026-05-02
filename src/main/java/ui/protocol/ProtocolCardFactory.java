@@ -13,10 +13,10 @@ public class ProtocolCardFactory {
         VBox card = new VBox(6);
         card.setPadding(new Insets(12));
         card.setStyle(
-                "-fx-border-color: #cccccc;" +
+                "-fx-border-color: #F2BED1;" +
                         "-fx-border-radius: 8;" +
                         "-fx-background-radius: 8;" +
-                        "-fx-background-color: #f8f8f8;"
+                        "-fx-background-color: #F9F5F6;"
         );
 
         Label title = new Label("Protocol #" + protocol.getId());
