@@ -8,50 +8,50 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import service.SampleService;
 
-public class SampleCardFactory {
+public class SampleCardFactory { //визуализация карточек образцов
 
-    private final SampleService sampleService;
-    private final Runnable afterChange;
+    private final SampleService sampleService; //ссылка на сервис образцов
+    private final Runnable afterChange; //поле хранит действие которое нужно выполнить после изменения образца
 
     public SampleCardFactory(SampleService sampleService, Runnable afterChange) {
         this.sampleService = sampleService;
         this.afterChange = afterChange;
     }
 
-    public VBox createSampleCard(Sample sample) {
-        VBox card = new VBox(6);
-        card.setPadding(new Insets(12));
-        card.setStyle(
-                "-fx-border-color: #cccccc;" +
-                        "-fx-border-radius: 8;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-background-color: #f8f8f8;"
+    public VBox createSampleCard(Sample sample) { //метод создания карточки
+        VBox card = new VBox(6); //создание вертикального контейнера card, 6 px - расстояние между элементами внутри контейнера
+        card.setPadding(new Insets(12)); //внутренние отступы
+        card.setStyle(  //стили карточки
+                "-fx-border-color: #cccccc;" + //цвет рамки
+                        "-fx-border-radius: 8;" + //скругление рамки
+                        "-fx-background-radius: 8;" + //скругление фона
+                        "-fx-background-color: #f8f8f8;" //цвет фона карточки
         );
 
-        Label title = new Label("Sample #" + sample.getId());
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        Label title = new Label("Sample #" + sample.getId()); //заголовок карточки
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;"); //стиль заголовка
 
-        Label name = new Label("name: " + sample.getName());
+        Label name = new Label("name: " + sample.getName()); //поля карточки
         Label type = new Label("type: " + sample.getType());
         Label location = new Label("location: " + sample.getLocation());
         Label status = new Label("status: " + sample.getStatus());
         Label owner = new Label("owner: " + sample.getOwnerUsername());
 
-        HBox buttons = new HBox(8);
+        HBox buttons = new HBox(8); //контейнер для кнопок, 8 расстояние между кнопками
 
-        Button editButton = new Button("Edit");
+        Button editButton = new Button("Edit"); //кнопка редактирования
         editButton.setOnAction(event ->
                 SampleDialogs.showEditSampleDialog(sampleService, sample, afterChange)
         );
 
-        Button archiveButton = new Button("Archive");
+        Button archiveButton = new Button("Archive"); //кнопка архивирования
         archiveButton.setOnAction(event ->
                 SampleDialogs.showArchiveSampleDialog(sampleService, sample, afterChange)
         );
 
-        buttons.getChildren().addAll(editButton, archiveButton);
+        buttons.getChildren().addAll(editButton, archiveButton); //добавление кнопок в HBox
 
-        card.getChildren().addAll(
+        card.getChildren().addAll( //добавление элементов в карточку
                 title,
                 name,
                 type,
@@ -61,6 +61,6 @@ public class SampleCardFactory {
                 buttons
         );
 
-        return card;
+        return card; //возврат готовой карточки
     }
 }

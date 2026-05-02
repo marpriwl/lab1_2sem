@@ -17,6 +17,8 @@ import ui.measurement.MeasurementPanel;
 import ui.protocol.ProtocolPanel;
 import ui.storage.StorageDialogs;
 
+import javafx.scene.image.Image;
+
 
 public class LabApplication extends Application {   //Application — базовый класс JavaFX-приложения.
 
@@ -27,11 +29,16 @@ public class LabApplication extends Application {   //Application — базов
     @Override
     public void start(Stage stage) {  //Если класс наследуется от Application, JavaFX ожидает, что в нём будет метод: start(Stage stage). Это главный метод JavaFX. Он вызывается автоматически при запуске приложения. Stage — это главное окно.
 
+        stage.getIcons().add(
+                new Image(getClass().getResourceAsStream("/icons/app-icon.png"))
+        );
+
         BorderPane root = new BorderPane(); //BorderPane — контейнер с зонами.
         root.setPadding(new Insets(12)); //Добавляет внутренний отступ 12 px со всех сторон.
 
         Label title = new Label("Lab Manager"); //Label — текстовая надпись.
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;"); //setStyle(...) задает CSS-стиль.
+        root.setStyle("-fx-background-color: #ffe4ec;");
 
         Button samplesButton = new Button("Samples");
         Button measurementsButton = new Button("Measurements");

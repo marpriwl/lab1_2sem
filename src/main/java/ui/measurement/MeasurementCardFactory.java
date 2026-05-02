@@ -14,7 +14,7 @@ public class MeasurementCardFactory {
                 "-fx-border-color: #cccccc;" +
                         "-fx-border-radius: 8;" +
                         "-fx-background-radius: 8;" +
-                        "-fx-background-color: #f8f8f8;"
+                        "-fx-background-color: #f8edeb;"
         );
 
         Label title = new Label("Measurement #" + measurement.getId());

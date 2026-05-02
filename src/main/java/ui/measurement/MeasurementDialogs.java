@@ -18,15 +18,15 @@ public class MeasurementDialogs {
     private MeasurementDialogs() {
     }
 
-    public static void showAddMeasurementDialog(
+    public static void showAddMeasurementDialog( //Открывает диалог добавления измерения.
             MeasurementService measurementService,
             Runnable afterSuccess
     ) {
-        Dialog<ButtonType> dialog = new Dialog<>();
+        Dialog<ButtonType> dialog = new Dialog<>(); //создание окна
         dialog.setTitle("Add Measurement");
         dialog.setHeaderText("Create new measurement");
 
-        TextField sampleIdField = new TextField();
+        TextField sampleIdField = new TextField(); //поля ввода
         sampleIdField.setPromptText("Sample ID");
 
         TextField paramField = new TextField();
@@ -41,7 +41,7 @@ public class MeasurementDialogs {
         TextField methodField = new TextField();
         methodField.setPromptText("Method");
 
-        GridPane form = createMeasurementForm(
+        GridPane form = createMeasurementForm( //создание формы
                 sampleIdField,
                 paramField,
                 valueField,
@@ -49,12 +49,12 @@ public class MeasurementDialogs {
                 methodField
         );
 
-        dialog.getDialogPane().setContent(form);
+        dialog.getDialogPane().setContent(form); //вставка формы и кнопок
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> result = dialog.showAndWait();
+        Optional<ButtonType> result = dialog.showAndWait(); //открытие и ожидание закрытия
 
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) { //Если пользователь нажал OK, программа начинает читать и проверять данные.
             try {
                 long sampleId = parseSampleId(sampleIdField.getText());
 
@@ -74,7 +74,7 @@ public class MeasurementDialogs {
 
                 measurementService.add(sampleId, param, value, unit, method);
                 afterSuccess.run();
-            } catch (Exception e) {
+            } catch (Exception e) { //ловим ошибку
                 AlertUtils.showError(e.getMessage());
             }
         }

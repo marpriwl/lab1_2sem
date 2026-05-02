@@ -1,0 +1,25 @@
+{
+  "samples" : [ {
+    "id" : 1,
+    "name" : "chlorine",
+    "type" : "gas",
+    "location" : "shelf 2",
+    "status" : "ACTIVE",
+    "ownerUsername" : "SYSTEM",
+    "createdAt" : "2026-05-02T00:02:43.935331600Z",
+    "updatedAt" : "2026-05-02T00:02:43.935331600Z"
+  } ],
+  "measurements" : [ {
+    "id" : 1,
+    "sampleId" : 1,
+    "param" : "PH",
+    "value" : 1.0,
+    "unit" : "pH",
+    "method" : "pH-metry",
+    "measuredAt" : "2026-05-02T00:03:13.485637100Z",
+    "ownerUsername" : "SYSTEM",
+    "createdAt" : "2026-05-02T00:03:13.485637100Z",
+    "updatedAt" : "2026-05-02T00:03:13.485637100Z"
+  } ],
+  "protocols" : [ ]
+}
