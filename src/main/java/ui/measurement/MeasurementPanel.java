@@ -34,8 +34,13 @@ public class MeasurementPanel extends VBox {
         Button refreshButton = new Button("Refresh");
         refreshButton.setOnAction(event -> refreshMeasurements());
 
+        Button statsButton = new Button("Show Stats");
+        statsButton.setOnAction(event ->
+                MeasurementDialogs.showStatsDialog(measurementService)
+        );
+
         HBox actionsPanel = new HBox(10);
-        actionsPanel.getChildren().addAll(addMeasurementButton, refreshButton);
+        actionsPanel.getChildren().addAll(addMeasurementButton, statsButton, refreshButton);
         actionsPanel.setPadding(new Insets(0, 0, 12, 0));
 
         cardsBox.setPadding(new Insets(10));

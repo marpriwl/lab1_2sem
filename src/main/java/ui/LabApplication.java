@@ -11,20 +11,21 @@ import javafx.stage.Stage;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
-import ui.sample.SamplePanel;
 
+import service.ServiceContext;
 import ui.measurement.MeasurementPanel;
 import ui.protocol.ProtocolPanel;
-import ui.storage.StorageDialogs;
+import ui.sample.SamplePanel;
 
 import javafx.scene.image.Image;
+import ui.storage.StorageDialogs;
 
 
 public class LabApplication extends Application {   //Application — базовый класс JavaFX-приложения.
 
-    private final SampleService sampleService = new SampleService();
-    private final MeasurementService measurementService = new MeasurementService(sampleService);
-    private final ProtocolService protocolService = new ProtocolService();
+    private final SampleService sampleService = ServiceContext.getSampleService();
+    private final MeasurementService measurementService = ServiceContext.getMeasurementService();
+    private final ProtocolService protocolService = ServiceContext.getProtocolService();
 
     @Override
     public void start(Stage stage) {  //Если класс наследуется от Application, JavaFX ожидает, что в нём будет метод: start(Stage stage). Это главный метод JavaFX. Он вызывается автоматически при запуске приложения. Stage — это главное окно.

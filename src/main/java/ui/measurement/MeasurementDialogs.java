@@ -80,6 +80,64 @@ public class MeasurementDialogs {
         }
     }
 
+    public static void showStatsDialog(MeasurementService measurementService) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Measurement Stats");
+        dialog.setHeaderText("Show measurement statistics");
+
+        TextField sampleIdField = new TextField();
+        sampleIdField.setPromptText("Sample ID");
+
+        TextField paramField = new TextField();
+        paramField.setPromptText("PH / CONDUCTIVITY / TURBIDITY / NITRATE");
+
+        GridPane form = new GridPane();
+        form.setHgap(10);
+        form.setVgap(10);
+        form.setPadding(new Insets(10));
+
+        form.add(new Label("Sample ID:"), 0, 0);
+        form.add(sampleIdField, 1, 0);
+
+        form.add(new Label("Param:"), 0, 1);
+        form.add(paramField, 1, 1);
+
+        dialog.getDialogPane().setContent(form);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                long sampleId = parseSampleId(sampleIdField.getText());
+
+                MeasurementParam param = MeasurementValidator.validateParam(
+                        paramField.getText()
+                );
+
+                String stats = measurementService.stats(sampleId, param);
+
+                showStatsResultDialog(stats);
+            } catch (Exception e) {
+                AlertUtils.showError(e.getMessage());
+            }
+        }
+    }
+
+    private static void showStatsResultDialog(String stats) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Measurement Stats");
+        dialog.setHeaderText("Statistics result");
+
+        Label resultLabel = new Label(stats);
+        resultLabel.setStyle("-fx-font-family: monospace; -fx-font-size: 14px;");
+
+        dialog.getDialogPane().setContent(resultLabel);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+
+        dialog.showAndWait();
+    }
+
     private static GridPane createMeasurementForm(
             TextField sampleIdField,
             TextField paramField,
