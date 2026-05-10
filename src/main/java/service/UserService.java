@@ -1,0 +1,101 @@
+package service;
+
+import domain.User;
+import security.PasswordHasher;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class UserService {
+
+    private final List<User> users;
+    private final PasswordHasher passwordHasher;
+    private User currentUser;
+    private long nextId;
+
+    public UserService() {
+        this.users = new ArrayList<>();
+        this.passwordHasher = new PasswordHasher();
+        this.currentUser = null;
+        this.nextId = 1;
+    }
+
+    private Optional<User> findByLogin(String login) {
+        for (User user : users) {
+            if (user.getLogin().equals(login)) {
+                return Optional.of(user);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public User register(String login, String password) {
+        if (login == null || login.isBlank()) {
+            throw new IllegalArgumentException("Ошибка: логин не может быть пустым");
+        }
+
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Ошибка: пароль не может быть пустым");
+        }
+
+        if (findByLogin(login).isPresent()) {
+            throw new IllegalArgumentException("Ошибка: логин уже занят");
+        }
+
+        String passwordHash = passwordHasher.hash(password);
+
+        User user = new User(nextId, login, passwordHash);
+        users.add(user);
+        nextId++;
+
+        return user;
+    }
+
+    public User login(String login, String password) {
+        if (login == null || login.isBlank()) {
+            throw new IllegalArgumentException("Ошибка: логин не может быть пустым");
+        }
+
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Ошибка: пароль не может быть пустым");
+        }
+
+        Optional<User> userOptional = findByLogin(login);
+
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("Ошибка: неверный логин или пароль");
+        }
+
+        User user = userOptional.get();
+
+        if (!passwordHasher.matches(password, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Ошибка: неверный логин или пароль");
+        }
+
+        this.currentUser = user;
+
+        return user;
+    }
+
+    public void logout() {
+        this.currentUser = null;
+    }
+
+    public boolean isLoggedIn() {
+        return currentUser != null;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public User requireLogin() {
+        if (currentUser == null) {
+            throw new IllegalStateException("Ошибка: сначала выполните login");
+        }
+
+        return currentUser;
+    }
+}
