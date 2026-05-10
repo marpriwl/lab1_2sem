@@ -20,6 +20,8 @@ import service.ProtocolService;
 import service.SampleService;
 import service.UserService;
 import storage.UserStorage;
+import cli.command.RegisterCommand;
+import cli.command.LoginCommand;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -72,6 +74,10 @@ public class LabCli {
     private void registerCommands() {
         register(new HelpCommand(() -> commands.values()));
         register(new ExitCommand());
+
+        register(new RegisterCommand());
+        register(new LoginCommand());
+
         register(new SaveCommand());
         register(new LoadCommand());
 
