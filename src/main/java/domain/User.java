@@ -2,18 +2,18 @@ package domain;
 
 import java.time.Instant;
 
-public final class User {
+public final class User {  //класс модель данных пользователя
 
-    private long id;
+    private long id;  //поля класса
     private String login;
     private String passwordHash;
     private Instant createdAt;
     private Instant updatedAt;
 
-    public User() {
+    public User() { //пустой конструктор для загрузки из JSON
     }
 
-    public User(long id, String login, String passwordHash) {
+    public User(long id, String login, String passwordHash) {  //конструктор класса
         this.id = id;
         this.login = login;
         this.passwordHash = passwordHash;
@@ -21,7 +21,7 @@ public final class User {
         this.updatedAt = Instant.now();
     }
 
-    public long getId() {
+    public long getId() {  //геттеры и сеттеры
         return id;
     }
 
@@ -38,7 +38,7 @@ public final class User {
     }
 
     public String getPasswordHash() {
-        return passwordHash = passwordHash;
+        return  passwordHash;
     }
 
     public void setPasswordHash(String passwordHash) {
@@ -61,7 +61,7 @@ public final class User {
         this.updatedAt = updatedAt;
     }
 
-    public void updateTimestamp() {
+    public void updateTimestamp() {  //"временная метка" метод, который обновляет поле updatedAt текущим временем
         this.updatedAt = Instant.now();
     }
 }
