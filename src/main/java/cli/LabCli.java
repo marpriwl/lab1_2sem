@@ -18,6 +18,8 @@ import cli.command.LoadCommand;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
+import service.UserService;
+import storage.UserStorage;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,9 +42,18 @@ public class LabCli {
     private final MeasurementService measurementService = new MeasurementService(sampleService);
     private final ProtocolService protocolService = new ProtocolService();
     private final Scanner scanner = new Scanner(System.in);
+    private final UserStorage userStorage = new UserStorage(Path.of("users.json"));
+    private final UserService userService = new UserService(userStorage.load());
 
     private final CliContext context =
-            new CliContext(sampleService, measurementService, protocolService, scanner);
+            new CliContext(
+                    sampleService,
+                    measurementService,
+                    protocolService,
+                    scanner,
+                    userStorage,
+                    userService
+            );
 
     private final Map<String, CliCommand> commands = new LinkedHashMap<>();
 
