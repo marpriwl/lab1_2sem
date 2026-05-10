@@ -16,6 +16,8 @@ public class SampleAddCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
+        context.getUserService().requireLogin();
+
         System.out.print("Название: ");
         String name = context.getScanner().nextLine().trim();
         SampleValidator.validateName(name);

@@ -15,6 +15,8 @@ public class SampleArchiveCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
+        context.getUserService().requireLogin();
+
         if (args.length < 2) {
             throw new IllegalArgumentException("нужен id");
         }

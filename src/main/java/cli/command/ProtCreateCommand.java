@@ -19,6 +19,8 @@ public class ProtCreateCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
+        context.getUserService().requireLogin();
+
         System.out.print("Название протокола: ");
         String name = context.getScanner().nextLine().trim();
         ProtocolValidator.validateName(name);

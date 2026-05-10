@@ -15,6 +15,8 @@ public class SampleUpdateCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
+        context.getUserService().requireLogin();
+
         if (args.length < 3) {
             throw new IllegalArgumentException("нужен id и field=value");
         }
