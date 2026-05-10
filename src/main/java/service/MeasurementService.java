@@ -19,7 +19,7 @@ public class MeasurementService {
         this.sampleService = sampleService;
     }
 
-    public long add(long sampleId, MeasurementParam param, double value, String unit, String method) {
+    public long add(long sampleId, MeasurementParam param, double value, String unit, String method, long ownerId) {
         Sample sample = sampleService.getById(sampleId);
         if (sample.getStatus() == SampleStatus.ARCHIVED) {
             throw new IllegalArgumentException("нельзя добавлять измерения к ARCHIVED образцу");
@@ -27,7 +27,7 @@ public class MeasurementService {
         MeasurementValidator.validate(value, unit, method);
 
         long id = idGenerator.nextId();
-        Measurement m = new Measurement(id, sampleId, param, value, unit, method, "SYSTEM");
+        Measurement m = new Measurement(id, sampleId, param, value, unit, method, ownerId);
         measurements.put(id, m);
         return id;
     }

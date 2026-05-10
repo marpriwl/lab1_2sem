@@ -13,10 +13,10 @@ public class ProtocolService {
     private final TreeMap<Long, Protocol> protocols = new TreeMap<>();
     private final IdGenerator idGenerator = new IdGenerator();
 
-    public long create(String name, Set<MeasurementParam> params) {
+    public long create(String name, Set<MeasurementParam> params, long ownerId) {
         ProtocolValidator.validate(name, params);
         long id = idGenerator.nextId();
-        Protocol p = new Protocol(id, name, params, "SYSTEM");
+        Protocol p = new Protocol(id, name, params, ownerId);
         protocols.put(id, p);
         return id;
     }

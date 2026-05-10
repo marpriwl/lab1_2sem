@@ -8,16 +8,19 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import service.SampleService;
+import service.UserService;
 
 public class SamplePanel extends VBox {  //VBox — контейнер JavaFX, который располагает элементы вертикально.
 
     private final SampleService sampleService;
     private final SampleCardFactory sampleCardFactory;
+    private final UserService userService;
 
     private final VBox cardsBox = new VBox(10); //контейнер для карточек
 
-    public SamplePanel(SampleService sampleService) {
+    public SamplePanel(SampleService sampleService, UserService userService) {
         this.sampleService = sampleService;
+        this.userService = userService;
         this.sampleCardFactory = new SampleCardFactory(sampleService, this::refreshSamples);
 
         setSpacing(10); //Эта строка задаёт расстояние между основными элементами панели.
@@ -25,7 +28,7 @@ public class SamplePanel extends VBox {  //VBox — контейнер JavaFX, �
 
         Button addSampleButton = new Button("Add Sample");
         addSampleButton.setOnAction(event ->
-                SampleDialogs.showAddSampleDialog(sampleService, this::refreshSamples)
+                SampleDialogs.showAddSampleDialog(sampleService, userService, this::refreshSamples)
         );
 
         Button refreshButton = new Button("Refresh");

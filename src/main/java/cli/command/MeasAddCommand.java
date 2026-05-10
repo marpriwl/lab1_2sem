@@ -17,7 +17,7 @@ public class MeasAddCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
-        context.getUserService().requireLogin();
+        long ownerId = context.getUserService().requireLogin().getId();
 
         if (args.length < 2) {
             throw new IllegalArgumentException("нужен sample_id");
@@ -52,7 +52,7 @@ public class MeasAddCommand implements CliCommand {
         String method = context.getScanner().nextLine().trim();
         MeasurementValidator.validateMethod(method);
 
-        long id = context.getMeasurementService().add(sampleId, param, value, unit, method);
+        long id = context.getMeasurementService().add(sampleId, param, value, unit, method, ownerId);
         System.out.println("OK measurement_id=" + id);
         return true;
     }

@@ -7,18 +7,18 @@ public final class Protocol {
     private long id;
     private String name;
     private Set<MeasurementParam> requiredParams;
-    private String ownerUsername;
+    private long ownerId;
     private Instant createdAt;
     private Instant updatedAt;
 
     public Protocol() {
     }
 
-    public Protocol(long id, String name, Set<MeasurementParam> requiredParams, String ownerUsername) {
+    public Protocol(long id, String name, Set<MeasurementParam> requiredParams, long ownerId) {
         this.id = id;
         this.name = name;
         this.requiredParams = requiredParams;
-        this.ownerUsername = ownerUsername;
+        this.ownerId = ownerId;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -26,7 +26,7 @@ public final class Protocol {
     public long getId() { return id; }
     public String getName() { return name; }
     public Set<MeasurementParam> getRequiredParams() { return requiredParams; }
-    public String getOwnerUsername() { return ownerUsername; }
+    public long getOwnerId() { return ownerId; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
     public void updateTimestamp() { this.updatedAt = Instant.now(); }
@@ -43,8 +43,8 @@ public final class Protocol {
         this.requiredParams = requiredParams;
     }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public void setCreatedAt(Instant createdAt) {

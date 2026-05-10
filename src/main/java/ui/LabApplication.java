@@ -17,6 +17,11 @@ import ui.measurement.MeasurementPanel;
 import ui.protocol.ProtocolPanel;
 import ui.sample.SamplePanel;
 
+import service.UserService;
+import storage.UserStorage;
+
+import java.nio.file.Path;
+
 import javafx.scene.image.Image;
 import ui.storage.StorageDialogs;
 
@@ -26,6 +31,8 @@ public class LabApplication extends Application {   //Application — базов
     private final SampleService sampleService = ServiceContext.getSampleService();
     private final MeasurementService measurementService = ServiceContext.getMeasurementService();
     private final ProtocolService protocolService = ServiceContext.getProtocolService();
+    private final UserStorage userStorage = new UserStorage(Path.of("users.json"));
+    private final UserService userService = new UserService(userStorage.load());
 
     @Override
     public void start(Stage stage) {  //Если класс наследуется от Application, JavaFX ожидает, что в нём будет метод: start(Stage stage). Это главный метод JavaFX. Он вызывается автоматически при запуске приложения. Stage — это главное окно.
@@ -59,9 +66,9 @@ public class LabApplication extends Application {   //Application — базов
         );
         topPanel.setPadding(new Insets(0, 0, 12, 0)); //Добавляет отступ. Формат: new Insets(top, right, bottom, left).
 
-        SamplePanel samplePanel = new SamplePanel(sampleService); //create SamplePanel — это отдельный JavaFX-блок, который отвечает за экран образцов.
-        MeasurementPanel measurementPanel = new MeasurementPanel(measurementService);
-        ProtocolPanel protocolPanel = new ProtocolPanel(protocolService, measurementService);
+        SamplePanel samplePanel = new SamplePanel(sampleService, userService); //create SamplePanel — это отдельный JavaFX-блок, который отвечает за экран образцов.
+        MeasurementPanel measurementPanel = new MeasurementPanel(measurementService, userService);
+        ProtocolPanel protocolPanel = new ProtocolPanel(protocolService, measurementService, userService);
 
         samplesButton.setOnAction(event -> root.setCenter(samplePanel));
         measurementsButton.setOnAction(event -> root.setCenter(measurementPanel));

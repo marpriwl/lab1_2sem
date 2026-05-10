@@ -29,7 +29,7 @@ public class ProtocolCardFactory {
                 .collect(Collectors.joining(", "));
 
         Label params = new Label("required params: " + requiredParams);
-        Label owner = new Label("owner: " + protocol.getOwnerUsername());
+        Label owner = new Label("owner: " + protocol.getOwnerId());
         Label createdAt = new Label("createdAt: " + protocol.getCreatedAt());
         Label updatedAt = new Label("updatedAt: " + protocol.getUpdatedAt());
 

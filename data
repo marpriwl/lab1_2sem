@@ -1,0 +1,25 @@
+{
+  "samples" : [ {
+    "id" : 1,
+    "name" : "CL",
+    "type" : "gas",
+    "location" : "1",
+    "status" : "ACTIVE",
+    "ownerId" : 1,
+    "createdAt" : "2026-05-10T19:27:08.152447200Z",
+    "updatedAt" : "2026-05-10T19:27:08.152447200Z"
+  } ],
+  "measurements" : [ {
+    "id" : 1,
+    "sampleId" : 1,
+    "param" : "PH",
+    "value" : 1.2,
+    "unit" : "pH",
+    "method" : "pH-metry",
+    "measuredAt" : "2026-05-10T19:27:35.172139600Z",
+    "ownerId" : 1,
+    "createdAt" : "2026-05-10T19:27:35.172139600Z",
+    "updatedAt" : "2026-05-10T19:27:35.172139600Z"
+  } ],
+  "protocols" : [ ]
+}

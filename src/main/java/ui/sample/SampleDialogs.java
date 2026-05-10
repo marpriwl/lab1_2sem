@@ -11,6 +11,7 @@ import javafx.scene.layout.GridPane;
 import service.SampleService;
 import ui.common.AlertUtils;
 import validation.SampleValidator;
+import service.UserService;
 
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class SampleDialogs {
     private SampleDialogs() {
     }
 
-    public static void showAddSampleDialog(SampleService sampleService, Runnable afterSuccess) {
+    public static void showAddSampleDialog(SampleService sampleService, UserService userService, Runnable afterSuccess) {
         Dialog<ButtonType> dialog = new Dialog<>();  //Создаем диалоговое окно
         dialog.setTitle("Add Sample");  //Заголовок окна
         dialog.setHeaderText("Create new sample");  //Заголовок внутри окна
@@ -44,9 +45,10 @@ public class SampleDialogs {
             try {
                 String name = nameField.getText().trim(); //убираем пробелы о краям
                 String type = typeField.getText().trim(); //убираем пробелы о краям
-                String location = locationField.getText().trim(); //убираем пробелы о краям
+                String location = locationField.getText().trim();//убираем пробелы о краям
+                long ownerId = userService.requireLogin().getId();
 
-                sampleService.add(name, type, location);  //создание образца через сервис
+                sampleService.add(name, type, location, ownerId);  //создание образца через сервис
                 afterSuccess.run(); //после успешного создания вызываем обновление карточек
             } catch (Exception e) {  //ловим ошибку
                 AlertUtils.showError(e.getMessage()); //обращаемся к Alert

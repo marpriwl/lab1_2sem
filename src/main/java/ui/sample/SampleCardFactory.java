@@ -35,7 +35,7 @@ public class SampleCardFactory { //визуализация карточек о�
         Label type = new Label("type: " + sample.getType());
         Label location = new Label("location: " + sample.getLocation());
         Label status = new Label("status: " + sample.getStatus());
-        Label owner = new Label("owner: " + sample.getOwnerUsername());
+        Label owner = new Label("owner: " + sample.getOwnerId());
 
         HBox buttons = new HBox(8); //контейнер для кнопок, 8 расстояние между кнопками
 

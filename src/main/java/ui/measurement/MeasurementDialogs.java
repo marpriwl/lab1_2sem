@@ -10,6 +10,7 @@ import javafx.scene.layout.GridPane;
 import service.MeasurementService;
 import ui.common.AlertUtils;
 import validation.MeasurementValidator;
+import service.UserService;
 
 import java.util.Optional;
 
@@ -20,7 +21,9 @@ public class MeasurementDialogs {
 
     public static void showAddMeasurementDialog( //Открывает диалог добавления измерения.
             MeasurementService measurementService,
+            UserService userService,
             Runnable afterSuccess
+
     ) {
         Dialog<ButtonType> dialog = new Dialog<>(); //создание окна
         dialog.setTitle("Add Measurement");
@@ -72,7 +75,9 @@ public class MeasurementDialogs {
                 String method = methodField.getText().trim();
                 MeasurementValidator.validateMethod(method);
 
-                measurementService.add(sampleId, param, value, unit, method);
+                long ownerId = userService.requireLogin().getId();
+
+                measurementService.add(sampleId, param, value, unit, method, ownerId);
                 afterSuccess.run();
             } catch (Exception e) { //ловим ошибку
                 AlertUtils.showError(e.getMessage());

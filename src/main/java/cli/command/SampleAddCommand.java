@@ -16,7 +16,7 @@ public class SampleAddCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
-        context.getUserService().requireLogin();
+        long ownerId = context.getUserService().requireLogin().getId();
 
         System.out.print("Название: ");
         String name = context.getScanner().nextLine().trim();
@@ -30,7 +30,7 @@ public class SampleAddCommand implements CliCommand {
         String location = context.getScanner().nextLine().trim();
         SampleValidator.validateLocation(location);
 
-        long id = context.getSampleService().add(name, type, location);
+        long id = context.getSampleService().add(name, type, location, ownerId);
         System.out.println("OK sample_id=" + id);
         return true;
     }

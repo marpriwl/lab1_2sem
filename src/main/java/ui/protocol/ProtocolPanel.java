@@ -1,6 +1,7 @@
 package ui.protocol;
 
 import domain.Protocol;
+import domain.User;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,22 +10,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import service.MeasurementService;
 import service.ProtocolService;
+import service.UserService;
 
 public class ProtocolPanel extends VBox {
 
     private final ProtocolService protocolService;
     private final MeasurementService measurementService;
     private final ProtocolCardFactory protocolCardFactory;
+    private final UserService userService;
 
     private final VBox cardsBox = new VBox(10);
 
     public ProtocolPanel(
             ProtocolService protocolService,
-            MeasurementService measurementService
+            MeasurementService measurementService,
+            UserService userService
     ) {
         this.protocolService = protocolService;
         this.measurementService = measurementService;
         this.protocolCardFactory = new ProtocolCardFactory();
+        this.userService = userService;
 
         setSpacing(10);
         setPadding(new Insets(0));
@@ -33,6 +38,7 @@ public class ProtocolPanel extends VBox {
         addProtocolButton.setOnAction(event ->
                 ProtocolDialogs.showAddProtocolDialog(
                         protocolService,
+                        userService,
                         this::refreshProtocols
                 )
         );

@@ -11,10 +11,10 @@ public class SampleService {
     private final TreeMap<Long, Sample> samples = new TreeMap<>();
     private final IdGenerator idGenerator = new IdGenerator();
 
-    public long add(String name, String type, String location) {
+    public long add(String name, String type, String location, long ownerId) {
         SampleValidator.validate(name, type, location);
         long id = idGenerator.nextId();
-        Sample sample = new Sample(id, name, type, location, SampleStatus.ACTIVE, "SYSTEM");
+        Sample sample = new Sample(id, name, type, location, SampleStatus.ACTIVE, ownerId);
         samples.put(id, sample);
         return id;
     }

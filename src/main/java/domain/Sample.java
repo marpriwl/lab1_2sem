@@ -8,7 +8,7 @@ public final class Sample {
     private String type;
     private String location;
     private SampleStatus status;
-    private String ownerUsername;
+    private long ownerId;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -16,13 +16,13 @@ public final class Sample {
     }
 
     public Sample(long id, String name, String type, String location,
-                  SampleStatus status, String ownerUsername) {
+                  SampleStatus status, long ownerId) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.location = location;
         this.status = status;
-        this.ownerUsername = ownerUsername;
+        this.ownerId = ownerId;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -50,10 +50,10 @@ public final class Sample {
 
     public void setStatus(SampleStatus status) { this.status = status; }
 
-    public String getOwnerUsername() { return ownerUsername; }
+    public long getOwnerId() { return ownerId; }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Instant getCreatedAt() { return createdAt; }

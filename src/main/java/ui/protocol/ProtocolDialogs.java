@@ -11,6 +11,7 @@ import service.MeasurementService;
 import service.ProtocolService;
 import ui.common.AlertUtils;
 import validation.ProtocolValidator;
+import service.UserService;
 
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ public class ProtocolDialogs {
 
     public static void showAddProtocolDialog(
             ProtocolService protocolService,
+            UserService userService,
             Runnable afterSuccess
     ) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -43,10 +45,12 @@ public class ProtocolDialogs {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 String name = nameField.getText().trim();
+                long ownerId = userService.requireLogin().getId();
 
                 protocolService.create(
                         name,
-                        ProtocolValidator.parseParams(paramsField.getText())
+                        ProtocolValidator.parseParams(paramsField.getText()),
+                        ownerId
                 );
 
                 afterSuccess.run();

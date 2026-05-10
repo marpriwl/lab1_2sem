@@ -10,7 +10,7 @@ public final class Measurement {
     private String unit;
     private String method;
     private Instant measuredAt;
-    private String ownerUsername;
+    private long ownerId;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -18,7 +18,7 @@ public final class Measurement {
     }
 
     public Measurement(long id, long sampleId, MeasurementParam param, double value,
-                       String unit, String method,  String ownerUsername) {
+                       String unit, String method,  long ownerId) {
         this.id = id;
         this.sampleId = sampleId;
         this.param = param;
@@ -26,7 +26,7 @@ public final class Measurement {
         this.unit = unit;
         this.method = method;
         this.measuredAt = Instant.now();
-        this.ownerUsername = ownerUsername;
+        this.ownerId = ownerId;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -37,7 +37,7 @@ public final class Measurement {
     public String getUnit() { return unit; }
     public String getMethod() { return method; }
     public Instant getMeasuredAt() { return measuredAt; }
-    public String getOwnerUsername() { return ownerUsername; }
+    public long getOwnerId() { return ownerId; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
     public void updateTimestamp() { this.updatedAt = Instant.now(); }
@@ -70,8 +70,8 @@ public final class Measurement {
         this.measuredAt = measuredAt;
     }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public void setCreatedAt(Instant createdAt) {

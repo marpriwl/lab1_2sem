@@ -26,7 +26,7 @@ public class MeasurementCardFactory {
         Label unit = new Label("unit: " + measurement.getUnit());
         Label method = new Label("method: " + measurement.getMethod());
         Label measuredAt = new Label("measuredAt: " + measurement.getMeasuredAt());
-        Label owner = new Label("owner: " + measurement.getOwnerUsername());
+        Label owner = new Label("owner: " + measurement.getOwnerId());
 
         card.getChildren().addAll(
                 title,

@@ -8,16 +8,19 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import service.MeasurementService;
+import service.UserService;
 
 public class MeasurementPanel extends VBox {
 
     private final MeasurementService measurementService;
+    private final UserService userService;
     private final MeasurementCardFactory measurementCardFactory;
 
     private final VBox cardsBox = new VBox(10);
 
-    public MeasurementPanel(MeasurementService measurementService) {
+    public MeasurementPanel(MeasurementService measurementService, UserService userService) {
         this.measurementService = measurementService;
+        this.userService = userService;
         this.measurementCardFactory = new MeasurementCardFactory();
 
         setSpacing(10);
@@ -27,6 +30,7 @@ public class MeasurementPanel extends VBox {
         addMeasurementButton.setOnAction(event ->
                 MeasurementDialogs.showAddMeasurementDialog(
                         measurementService,
+                        userService,
                         this::refreshMeasurements
                 )
         );

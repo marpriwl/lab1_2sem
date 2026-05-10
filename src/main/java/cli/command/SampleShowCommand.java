@@ -29,7 +29,7 @@ public class SampleShowCommand implements CliCommand {
                 sample.getType(),
                 sample.getLocation(),
                 sample.getStatus(),
-                sample.getOwnerUsername(),
+                sample.getOwnerId(),
                 0
         );
 

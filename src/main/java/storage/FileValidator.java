@@ -60,8 +60,8 @@ public class FileValidator {
                 throw new IllegalArgumentException("sample.status отсутствует у sample.id=" + sample.getId());
             }
 
-            if (sample.getOwnerUsername() == null || sample.getOwnerUsername().trim().isEmpty()) {
-                throw new IllegalArgumentException("sample.ownerUsername отсутствует у sample.id=" + sample.getId());
+            if (sample.getOwnerId() <= 0) {
+                throw new IllegalArgumentException("sample.ownerId должен быть больше 0 у sample.id=" + sample.getId());
             }
 
             if (sample.getCreatedAt() == null) {
@@ -116,8 +116,8 @@ public class FileValidator {
                 throw new IllegalArgumentException("measurement.measuredAt отсутствует у measurement.id=" + measurement.getId());
             }
 
-            if (measurement.getOwnerUsername() == null || measurement.getOwnerUsername().trim().isEmpty()) {
-                throw new IllegalArgumentException("measurement.ownerUsername отсутствует у measurement.id=" + measurement.getId());
+            if (measurement.getOwnerId() <= 0) {
+                throw new IllegalArgumentException("measurement.ownerId должен быть больше 0 у sample.id=" + measurement.getId());
             }
 
             if (measurement.getCreatedAt() == null) {
@@ -151,8 +151,8 @@ public class FileValidator {
                     protocol.getRequiredParams()
             );
 
-            if (protocol.getOwnerUsername() == null || protocol.getOwnerUsername().trim().isEmpty()) {
-                throw new IllegalArgumentException("protocol.ownerUsername отсутствует у protocol.id=" + protocol.getId());
+            if (protocol.getOwnerId() <= 0) {
+                throw new IllegalArgumentException("protocol.ownerId должен быть больше 0 у protocol.id=" + protocol.getId());
             }
 
             if (protocol.getCreatedAt() == null) {

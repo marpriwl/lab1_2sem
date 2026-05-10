@@ -19,7 +19,7 @@ public class ProtCreateCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
-        context.getUserService().requireLogin();
+        long ownerId = context.getUserService().requireLogin().getId();
 
         System.out.print("Название протокола: ");
         String name = context.getScanner().nextLine().trim();
@@ -30,7 +30,7 @@ public class ProtCreateCommand implements CliCommand {
                 context.getScanner().nextLine()
         );
 
-        long id = context.getProtocolService().create(name, params);
+        long id = context.getProtocolService().create(name, params, ownerId);
         System.out.println("OK protocol_id=" + id);
         return true;
     }
