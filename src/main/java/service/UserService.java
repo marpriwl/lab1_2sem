@@ -15,10 +15,26 @@ public class UserService {
     private long nextId;
 
     public UserService() {
-        this.users = new ArrayList<>();
+        this(new ArrayList<>());
+    }
+
+    public UserService(List<User> loadedUsers) {
+        this.users = new ArrayList<>(loadedUsers);
         this.passwordHasher = new PasswordHasher();
         this.currentUser = null;
-        this.nextId = 1;
+        this.nextId = calculateNextId();
+    }
+
+    private long calculateNextId() {
+        long maxId = 0;
+
+        for (User user : users) {
+            if (user.getId() > maxId) {
+                maxId = user.getId();
+            }
+        }
+
+        return maxId + 1;
     }
 
     private Optional<User> findByLogin(String login) {
@@ -97,5 +113,9 @@ public class UserService {
         }
 
         return currentUser;
+    }
+
+    public List<User> getAllUsers() {
+        return new ArrayList<>(users);
     }
 }
