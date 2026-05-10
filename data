@@ -1,25 +1,32 @@
 {
   "samples" : [ {
     "id" : 1,
-    "name" : "CL",
+    "name" : "Cl",
     "type" : "gas",
-    "location" : "1",
+    "location" : "shelf 1",
     "status" : "ACTIVE",
-    "ownerId" : 1,
-    "createdAt" : "2026-05-10T19:27:08.152447200Z",
-    "updatedAt" : "2026-05-10T19:27:08.152447200Z"
+    "ownerId" : 2,
+    "createdAt" : "2026-05-10T20:03:53.314743600Z",
+    "updatedAt" : "2026-05-10T20:03:53.314743600Z"
   } ],
   "measurements" : [ {
     "id" : 1,
     "sampleId" : 1,
     "param" : "PH",
-    "value" : 1.2,
+    "value" : 2.0,
     "unit" : "pH",
     "method" : "pH-metry",
-    "measuredAt" : "2026-05-10T19:27:35.172139600Z",
-    "ownerId" : 1,
-    "createdAt" : "2026-05-10T19:27:35.172139600Z",
-    "updatedAt" : "2026-05-10T19:27:35.172139600Z"
+    "measuredAt" : "2026-05-10T20:04:11.857713200Z",
+    "ownerId" : 2,
+    "createdAt" : "2026-05-10T20:04:11.857713200Z",
+    "updatedAt" : "2026-05-10T20:04:11.857713200Z"
   } ],
-  "protocols" : [ ]
+  "protocols" : [ {
+    "id" : 1,
+    "name" : "PH1",
+    "requiredParams" : [ "PH" ],
+    "ownerId" : 2,
+    "createdAt" : "2026-05-10T20:04:33.042498Z",
+    "updatedAt" : "2026-05-10T20:04:33.042498Z"
+  } ]
 }

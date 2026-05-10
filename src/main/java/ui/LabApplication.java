@@ -25,6 +25,12 @@ import java.nio.file.Path;
 import javafx.scene.image.Image;
 import ui.storage.StorageDialogs;
 
+import service.UserService;
+import storage.UserStorage;
+import ui.auth.AuthDialogs;
+
+import java.nio.file.Path;
+
 
 public class LabApplication extends Application {   //Application — базовый класс JavaFX-приложения.
 
@@ -55,9 +61,33 @@ public class LabApplication extends Application {   //Application — базов
         Button saveButton = new Button("Save JSON");
         Button loadButton = new Button("Load JSON");
 
+        Button registerButton = new Button("Register");
+        Button loginButton = new Button("Login");
+        Button logoutButton = new Button("Logout");
+
+        Label authLabel = new Label();
+
+        Runnable refreshAuthLabel = () -> {
+            if (userService.isLoggedIn()) {
+                authLabel.setText(
+                        "User: " +
+                                userService.getCurrentUser().getLogin() +
+                                " (id=" + userService.getCurrentUser().getId() + ")"
+                );
+            } else {
+                authLabel.setText("User: not logged in");
+            }
+        };
+
+        refreshAuthLabel.run();
+
         HBox topPanel = new HBox(10); //HBox — горизонтальный контейнер, размещает эл-ты слева направо, 10 — расстояние между элементами.
         topPanel.getChildren().addAll( //getChildren() — список элементов внутри контейнера.
                 title,                 //addAll(...) добавляет в HBox сразу несколько элементов.
+                authLabel,
+                registerButton,
+                loginButton,
+                logoutButton,
                 samplesButton,
                 measurementsButton,
                 protocolsButton,
@@ -69,6 +99,28 @@ public class LabApplication extends Application {   //Application — базов
         SamplePanel samplePanel = new SamplePanel(sampleService, userService); //create SamplePanel — это отдельный JavaFX-блок, который отвечает за экран образцов.
         MeasurementPanel measurementPanel = new MeasurementPanel(measurementService, userService);
         ProtocolPanel protocolPanel = new ProtocolPanel(protocolService, measurementService, userService);
+
+        registerButton.setOnAction(event ->
+                AuthDialogs.showRegisterDialog(
+                        userService,
+                        userStorage,
+                        refreshAuthLabel
+                )
+        );
+
+        loginButton.setOnAction(event ->
+                AuthDialogs.showLoginDialog(
+                        userService,
+                        refreshAuthLabel
+                )
+        );
+
+        logoutButton.setOnAction(event ->
+                AuthDialogs.logout(
+                        userService,
+                        refreshAuthLabel
+                )
+        );
 
         samplesButton.setOnAction(event -> root.setCenter(samplePanel));
         measurementsButton.setOnAction(event -> root.setCenter(measurementPanel));
