@@ -27,6 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import cli.command.LogoutCommand;
+import cli.command.WhoamiCommand;
+
 import domain.Measurement;
 import domain.Protocol;
 import domain.Sample;
@@ -77,6 +80,8 @@ public class LabCli {
 
         register(new RegisterCommand());
         register(new LoginCommand());
+        register(new LogoutCommand());
+        register(new WhoamiCommand());
 
         register(new SaveCommand());
         register(new LoadCommand());
