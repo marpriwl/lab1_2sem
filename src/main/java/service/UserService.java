@@ -2,6 +2,7 @@ package service;
 
 import domain.User;
 import security.PasswordHasher;
+import storage.DbStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +11,22 @@ import java.util.Optional;
 public class UserService {
 
     private final List<User> users;
+    private final DbStorage dbStorage;
     private final PasswordHasher passwordHasher;
     private User currentUser;
     private long nextId;
 
     public UserService() {
-        this(new ArrayList<>());
+        this(new ArrayList<>(), null);
     }
 
     public UserService(List<User> loadedUsers) {
+        this(loadedUsers, null);
+    }
+
+    public UserService(List<User> loadedUsers, DbStorage dbStorage) {
         this.users = new ArrayList<>(loadedUsers);
+        this.dbStorage = dbStorage;
         this.passwordHasher = new PasswordHasher();
         this.currentUser = null;
         this.nextId = calculateNextId();
@@ -62,12 +69,24 @@ public class UserService {
 
         String passwordHash = passwordHasher.hash(password);
 
-        User user = new User(nextId, login, passwordHash);
+        long id = dbStorage == null ? nextId : 0;
+        User user = new User(id, login, passwordHash);
+
+        if (dbStorage != null) {
+            user = dbStorage.insertUser(user);
+        }
+
         users.add(user);
-        nextId++;
+
+        if (dbStorage == null) {
+            nextId++;
+        } else {
+            nextId = calculateNextId();
+        }
 
         return user;
     }
+
 
     public User login(String login, String password) {
         if (login == null || login.isBlank()) {
@@ -118,4 +137,6 @@ public class UserService {
     public List<User> getAllUsers() {
         return new ArrayList<>(users);
     }
+
+
 }

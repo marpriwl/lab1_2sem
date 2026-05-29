@@ -12,24 +12,22 @@ public class RegisterCommand implements CliCommand {
 
     @Override
     public String description() {
-        return "register — зарегистрировать нового пользователя";
+        return "register - create a new user in PostgreSQL";
     }
 
     @Override
     public boolean execute(String[] args, CliContext context) {
         if (args.length != 1) {
-            throw new IllegalArgumentException("используйте: register");
+            throw new IllegalArgumentException("Use: register");
         }
 
-        System.out.print("Логин: ");
+        System.out.print("Login: ");
         String login = context.getScanner().nextLine().trim();
 
-        System.out.print("Пароль: ");
+        System.out.print("Password: ");
         String password = context.getScanner().nextLine().trim();
 
-        User user = context.getUserService().register(login, password); //сохранение пользователя в память
-
-        context.getUserStorage().save(context.getUserService().getAllUsers());  //сохранение пользователя в файл
+        User user = context.getUserService().register(login, password);
 
         System.out.println("OK user_id=" + user.getId());
         return true;

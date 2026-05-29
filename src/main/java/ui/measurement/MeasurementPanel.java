@@ -36,7 +36,10 @@ public class MeasurementPanel extends VBox {
         );
 
         Button refreshButton = new Button("Refresh");
-        refreshButton.setOnAction(event -> refreshMeasurements());
+        refreshButton.setOnAction(event -> {
+            measurementService.refreshFromDatabase();
+            refreshMeasurements();
+        });
 
         Button statsButton = new Button("Show Stats");
         statsButton.setOnAction(event ->

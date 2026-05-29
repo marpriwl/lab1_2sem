@@ -7,51 +7,62 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import service.SampleService;
+import service.UserService;
 
-public class SampleCardFactory { //визуализация карточек образцов
+public class SampleCardFactory {
 
-    private final SampleService sampleService; //ссылка на сервис образцов
-    private final Runnable afterChange; //поле хранит действие которое нужно выполнить после изменения образца
+    private final SampleService sampleService;
+    private final UserService userService;
+    private final Runnable afterChange;
 
-    public SampleCardFactory(SampleService sampleService, Runnable afterChange) {
+    public SampleCardFactory(
+            SampleService sampleService,
+            UserService userService,
+            Runnable afterChange
+    ) {
         this.sampleService = sampleService;
+        this.userService = userService;
         this.afterChange = afterChange;
     }
 
-    public VBox createSampleCard(Sample sample) { //метод создания карточки
-        VBox card = new VBox(6); //создание вертикального контейнера card, 6 px - расстояние между элементами внутри контейнера
-        card.setPadding(new Insets(12)); //внутренние отступы
-        card.setStyle(  //стили карточки
-                "-fx-border-color: #F2BED1;" + //цвет рамки
-                        "-fx-border-radius: 8;" + //скругление рамки
-                        "-fx-background-radius: 8;" + //скругление фона
-                        "-fx-background-color: #F9F5F6;" //цвет фона карточки
+    public VBox createSampleCard(Sample sample) {
+        VBox card = new VBox(6);
+        card.setPadding(new Insets(12));
+        card.setStyle(
+                "-fx-border-color: #F2BED1;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-background-color: #F9F5F6;"
         );
 
-        Label title = new Label("Sample #" + sample.getId()); //заголовок карточки
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;"); //стиль заголовка
+        Label title = new Label("Sample #" + sample.getId());
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        Label name = new Label("name: " + sample.getName()); //поля карточки
+        Label name = new Label("name: " + sample.getName());
         Label type = new Label("type: " + sample.getType());
         Label location = new Label("location: " + sample.getLocation());
         Label status = new Label("status: " + sample.getStatus());
-        Label owner = new Label("owner: " + sample.getOwnerId());
+        Label owner = new Label("Owner: " + sample.getOwnerId());
 
-        HBox buttons = new HBox(8); //контейнер для кнопок, 8 расстояние между кнопками
-
-        Button editButton = new Button("Edit"); //кнопка редактирования
+        Button editButton = new Button("Edit");
         editButton.setOnAction(event ->
-                SampleDialogs.showEditSampleDialog(sampleService, sample, afterChange)
+                SampleDialogs.showEditSampleDialog(sampleService, userService, sample, afterChange)
         );
 
-        Button archiveButton = new Button("Archive"); //кнопка архивирования
+        Button archiveButton = new Button("Archive");
         archiveButton.setOnAction(event ->
-                SampleDialogs.showArchiveSampleDialog(sampleService, sample, afterChange)
+                SampleDialogs.showArchiveSampleDialog(sampleService, userService, sample, afterChange)
         );
 
-        buttons.getChildren().addAll(editButton, archiveButton); //добавление кнопок в HBox
+        boolean canEdit = userService.isLoggedIn()
+                && userService.getCurrentUser().getId() == sample.getOwnerId();
+        editButton.setDisable(!canEdit);
+        archiveButton.setDisable(!canEdit);
 
-        card.getChildren().addAll( //добавление элементов в карточку
+        HBox buttons = new HBox(8);
+        buttons.getChildren().addAll(editButton, archiveButton);
+
+        card.getChildren().addAll(
                 title,
                 name,
                 type,
@@ -61,6 +72,6 @@ public class SampleCardFactory { //визуализация карточек о�
                 buttons
         );
 
-        return card; //возврат готовой карточки
+        return card;
     }
 }

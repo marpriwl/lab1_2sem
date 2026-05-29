@@ -15,14 +15,14 @@ public class SampleArchiveCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
-        context.getUserService().requireLogin();
+        long actorId = context.getUserService().requireLogin().getId();
 
         if (args.length < 2) {
             throw new IllegalArgumentException("нужен id");
         }
 
         long id = Long.parseLong(args[1]);
-        context.getSampleService().archive(id);
+        context.getSampleService().archive(id, actorId);
         System.out.println("OK sample " + id + " archived");
         return true;
     }

@@ -3,6 +3,7 @@ package service;
 import domain.Measurement;
 import domain.MeasurementParam;
 import domain.Protocol;
+import storage.DbStorage;
 import validation.ProtocolValidator;
 
 import java.util.Set;
@@ -11,32 +12,54 @@ import java.util.stream.Collectors;
 
 public class ProtocolService {
     private final TreeMap<Long, Protocol> protocols = new TreeMap<>();
-    private final IdGenerator idGenerator = new IdGenerator();
+    private final DbStorage dbStorage;
+
+    public ProtocolService() {
+        this(null);
+    }
+
+    public ProtocolService(DbStorage dbStorage) {
+        this.dbStorage = dbStorage;
+    }
 
     public long create(String name, Set<MeasurementParam> params, long ownerId) {
         ProtocolValidator.validate(name, params);
-        long id = idGenerator.nextId();
-        Protocol p = new Protocol(id, name, params, ownerId);
-        protocols.put(id, p);
+
+        long id = dbStorage == null ? IdGenerator.nextProtocolId() : 0;
+        Protocol protocol = new Protocol(id, name, params, ownerId);
+
+        if (dbStorage != null) {
+            protocol = dbStorage.insertProtocol(protocol);
+            id = protocol.getId();
+        }
+
+        protocols.put(id, protocol);
         return id;
     }
 
     public String apply(long protocolId, long sampleId, MeasurementService measService) {
-        Protocol p = protocols.get(protocolId);
-        if (p == null) throw new IllegalArgumentException("протокол не найден");
-        measService.getAll(); // just to ensure sample exists (we check inside list)
+        Protocol protocol = protocols.get(protocolId);
+
+        if (protocol == null) {
+            throw new IllegalArgumentException("Protocol was not found");
+        }
 
         var existingParams = measService.getAll().values().stream()
-                .filter(m -> m.getSampleId() == sampleId)
+                .filter(measurement -> measurement.getSampleId() == sampleId)
                 .map(Measurement::getParam)
                 .collect(Collectors.toSet());
 
-        var missing = p.getRequiredParams().stream()
+        var missing = protocol.getRequiredParams().stream()
                 .filter(param -> !existingParams.contains(param))
                 .toList();
 
-        if (missing.isEmpty()) return "OK protocol is complete";
-        return "Missing params: " + missing.stream().map(Enum::name).collect(Collectors.joining(", "));
+        if (missing.isEmpty()) {
+            return "OK protocol is complete";
+        }
+
+        return "Missing params: " + missing.stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
     }
 
     public void replaceAll(TreeMap<Long, Protocol> loadedProtocols) {
@@ -47,8 +70,28 @@ public class ProtocolService {
                 ? 1
                 : protocols.lastKey() + 1;
 
-        idGenerator.setNextId(nextId);
+        IdGenerator.setProtocolId(nextId);
     }
 
-    public TreeMap<Long, Protocol> getAll() { return protocols; }
+    public void refreshFromDatabase() {
+        if (dbStorage == null) {
+            return;
+        }
+
+        TreeMap<Long, Protocol> loadedProtocols = dbStorage.loadLabData()
+                .getProtocols()
+                .stream()
+                .collect(Collectors.toMap(
+                        Protocol::getId,
+                        protocol -> protocol,
+                        (left, right) -> left,
+                        TreeMap::new
+                ));
+
+        replaceAll(loadedProtocols);
+    }
+
+    public TreeMap<Long, Protocol> getAll() {
+        return protocols;
+    }
 }

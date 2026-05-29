@@ -21,7 +21,7 @@ public class SamplePanel extends VBox {  //VBox — контейнер JavaFX, �
     public SamplePanel(SampleService sampleService, UserService userService) {
         this.sampleService = sampleService;
         this.userService = userService;
-        this.sampleCardFactory = new SampleCardFactory(sampleService, this::refreshSamples);
+        this.sampleCardFactory = new SampleCardFactory(sampleService, userService, this::refreshSamples);
 
         setSpacing(10); //Эта строка задаёт расстояние между основными элементами панели.
         setPadding(new Insets(0)); //внутр отступы
@@ -32,7 +32,10 @@ public class SamplePanel extends VBox {  //VBox — контейнер JavaFX, �
         );
 
         Button refreshButton = new Button("Refresh");
-        refreshButton.setOnAction(event -> refreshSamples());
+        refreshButton.setOnAction(event -> {
+            sampleService.refreshFromDatabase();
+            refreshSamples();
+        });
 
         HBox actionsPanel = new HBox(10); //Создаётся горизонтальный контейнер для кнопок.
         actionsPanel.getChildren().addAll(addSampleButton, refreshButton);

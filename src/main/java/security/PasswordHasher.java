@@ -27,6 +27,5 @@ public class PasswordHasher {  //класс, который отвечает з�
     public boolean matches(String password, String passwordHash) {
         String hashedPassword = hash(password);  //переводим пароль в хеш
         return hashedPassword.equals(passwordHash);  //сравниваем хеши
-
     }
 }

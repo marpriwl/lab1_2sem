@@ -52,7 +52,10 @@ public class ProtocolPanel extends VBox {
         );
 
         Button refreshButton = new Button("Refresh");
-        refreshButton.setOnAction(event -> refreshProtocols());
+        refreshButton.setOnAction(event -> {
+            protocolService.refreshFromDatabase();
+            refreshProtocols();
+        });
 
         HBox actionsPanel = new HBox(10);
         actionsPanel.getChildren().addAll(

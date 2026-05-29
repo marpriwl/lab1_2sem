@@ -1,16 +1,29 @@
 package service;
 
 public class IdGenerator {
-    private long currentId = 1;
+    private static long sampleIdCounter = 1;
+    private static long measurementIdCounter = 1;
+    private static long protocolIdCounter = 1;
 
-    public long nextId() {
-        return currentId++;
-    }
+    private IdGenerator() {}
 
-    public void setNextId(long nextId) {
-        if (nextId < 1) {
-            throw new IllegalArgumentException("nextId должен быть положительным");
+    public static synchronized long nextSampleId() {
+            return sampleIdCounter++;
         }
-        this.currentId = nextId;
+    public static synchronized long nextMeasurementId() {
+        return measurementIdCounter++;
     }
+    public static synchronized long nextProtocolId() {
+        return protocolIdCounter++;
+    }
+    public static synchronized void setSampleId(long id) {
+        sampleIdCounter = id;
+    }
+    public static synchronized void setMeasurementId(long id) {
+        measurementIdCounter = id;
+    }
+    public static synchronized void setProtocolId(long id) {
+        protocolIdCounter = id;
+    }
+
 }

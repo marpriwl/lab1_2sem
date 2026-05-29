@@ -2,6 +2,7 @@ package service;
 
 import domain.Sample;
 import domain.SampleStatus;
+import storage.DbStorage;
 import validation.SampleValidator;
 
 import java.util.TreeMap;
@@ -9,64 +10,121 @@ import java.util.stream.Collectors;
 
 public class SampleService {
     private final TreeMap<Long, Sample> samples = new TreeMap<>();
-    private final IdGenerator idGenerator = new IdGenerator();
+    private final DbStorage dbStorage;
+
+    public SampleService() {
+        this(null);
+    }
+
+    public SampleService(DbStorage dbStorage) {
+        this.dbStorage = dbStorage;
+    }
 
     public long add(String name, String type, String location, long ownerId) {
         SampleValidator.validate(name, type, location);
-        long id = idGenerator.nextId();
+
+        long id = dbStorage == null ? IdGenerator.nextSampleId() : 0;
         Sample sample = new Sample(id, name, type, location, SampleStatus.ACTIVE, ownerId);
+
+        if (dbStorage != null) {
+            sample = dbStorage.insertSample(sample);
+            id = sample.getId();
+        }
+
         samples.put(id, sample);
         return id;
     }
 
     public Sample getById(long id) {
-        Sample s = samples.get(id);
-        if (s == null) throw new IllegalArgumentException("образец с id=" + id + " не найден");
-        return s;
+        Sample sample = samples.get(id);
+
+        if (sample == null) {
+            throw new IllegalArgumentException("Sample id=" + id + " was not found");
+        }
+
+        return sample;
     }
 
     public String list(String statusFilter) {
         var stream = samples.values().stream();
 
         if (statusFilter != null) {
-            SampleStatus st = SampleStatus.valueOf(statusFilter.toUpperCase());
-            stream = stream.filter(s -> s.getStatus() == st);
+            SampleStatus status = SampleStatus.valueOf(statusFilter.toUpperCase());
+            stream = stream.filter(sample -> sample.getStatus() == status);
         }
 
         var result = stream.toList();
 
         if (result.isEmpty()) {
-            return "Нет образцов";
+            return "No samples";
         }
 
         return result.stream()
-                .map(s -> String.format("%-4d %-20s %-10s %-15s %s",
-                        s.getId(), s.getName(), s.getType(), s.getLocation(), s.getStatus()))
-                .collect(java.util.stream.Collectors.joining("\n"));
+                .map(sample -> String.format(
+                        "%-4d %-20s %-10s %-15s %-10s owner=%d",
+                        sample.getId(),
+                        sample.getName(),
+                        sample.getType(),
+                        sample.getLocation(),
+                        sample.getStatus(),
+                        sample.getOwnerId()
+                ))
+                .collect(Collectors.joining("\n"));
     }
 
     public void update(long id, String field, String value) {
-        Sample s = getById(id);
+        update(id, field, value, -1);
+    }
+
+    public void update(long id, String field, String value, long actorId) {
+        Sample sample = getById(id);
+        ensureOwner(sample, actorId);
+
         switch (field.toLowerCase()) {
-            case "name" -> { SampleValidator.validate(value, s.getType(), s.getLocation()); s.setName(value); }
-            case "type" -> { SampleValidator.validate(s.getName(), value, s.getLocation()); s.setType(value); }
-            case "location" -> { SampleValidator.validate(s.getName(), s.getType(), value); s.setLocation(value); }
+            case "name" -> {
+                SampleValidator.validate(value, sample.getType(), sample.getLocation());
+                sample.setName(value);
+            }
+            case "type" -> {
+                SampleValidator.validate(sample.getName(), value, sample.getLocation());
+                sample.setType(value);
+            }
+            case "location" -> {
+                SampleValidator.validate(sample.getName(), sample.getType(), value);
+                sample.setLocation(value);
+            }
             case "status" -> {
                 SampleValidator.validateStatus(value);
-                s.setStatus(SampleStatus.valueOf(value.toUpperCase()));
+                sample.setStatus(SampleStatus.valueOf(value.toUpperCase()));
             }
-            default -> throw new IllegalArgumentException("нельзя менять поле '" + field + "'");
+            default -> throw new IllegalArgumentException("Cannot update field '" + field + "'");
         }
-        s.updateTimestamp();
+
+        sample.updateTimestamp();
+
+        if (dbStorage != null) {
+            dbStorage.updateSample(sample);
+        }
     }
 
     public void archive(long id) {
-        Sample s = getById(id);
-        if (s.getStatus() == SampleStatus.ARCHIVED) {
-            throw new IllegalArgumentException("образец уже ARCHIVED");
+        archive(id, -1);
+    }
+
+    public void archive(long id, long actorId) {
+        Sample sample = getById(id);
+        ensureOwner(sample, actorId);
+
+        if (sample.getStatus() == SampleStatus.ARCHIVED) {
+            throw new IllegalArgumentException("Sample is already archived");
         }
-        s.setStatus(SampleStatus.ARCHIVED);
-        s.updateTimestamp();
+
+        sample.setStatus(SampleStatus.ARCHIVED);
+        sample.updateTimestamp();
+
+        if (dbStorage != null) {
+            dbStorage.updateSample(sample);
+        }
     }
 
     public void replaceAll(TreeMap<Long, Sample> loadedSamples) {
@@ -77,8 +135,34 @@ public class SampleService {
                 ? 1
                 : samples.lastKey() + 1;
 
-        idGenerator.setNextId(nextId);
+        IdGenerator.setSampleId(nextId);
     }
 
-    public TreeMap<Long, Sample> getAll() { return samples; }
+    public void refreshFromDatabase() {
+        if (dbStorage == null) {
+            return;
+        }
+
+        TreeMap<Long, Sample> loadedSamples = dbStorage.loadLabData()
+                .getSamples()
+                .stream()
+                .collect(Collectors.toMap(
+                        Sample::getId,
+                        sample -> sample,
+                        (left, right) -> left,
+                        TreeMap::new
+                ));
+
+        replaceAll(loadedSamples);
+    }
+
+    public TreeMap<Long, Sample> getAll() {
+        return samples;
+    }
+
+    private void ensureOwner(Sample sample, long actorId) {
+        if (actorId > 0 && sample.getOwnerId() != actorId) {
+            throw new IllegalStateException("Error: you cannot change another user's sample");
+        }
+    }
 }

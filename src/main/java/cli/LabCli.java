@@ -3,74 +3,75 @@ package cli;
 import cli.command.CliCommand;
 import cli.command.ExitCommand;
 import cli.command.HelpCommand;
+import cli.command.LoginCommand;
+import cli.command.LogoutCommand;
 import cli.command.MeasAddCommand;
 import cli.command.MeasListCommand;
 import cli.command.MeasStatsCommand;
 import cli.command.ProtApplyCommand;
 import cli.command.ProtCreateCommand;
+import cli.command.RegisterCommand;
 import cli.command.SampleAddCommand;
 import cli.command.SampleArchiveCommand;
 import cli.command.SampleListCommand;
 import cli.command.SampleShowCommand;
 import cli.command.SampleUpdateCommand;
-import cli.command.SaveCommand;
-import cli.command.LoadCommand;
+import cli.command.WhoamiCommand;
+import db.DataBaseInitializer;
+import domain.Measurement;
+import domain.Protocol;
+import domain.Sample;
+import domain.User;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
 import service.UserService;
-import storage.UserStorage;
-import cli.command.RegisterCommand;
-import cli.command.LoginCommand;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Scanner;
-
-import cli.command.LogoutCommand;
-import cli.command.WhoamiCommand;
-
-import domain.Measurement;
-import domain.Protocol;
-import domain.Sample;
-import storage.FileStorage;
-import storage.FileValidator;
+import storage.DbStorage;
 import storage.LabData;
 
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LabCli {
-    private final SampleService sampleService = new SampleService();
-    private final MeasurementService measurementService = new MeasurementService(sampleService);
-    private final ProtocolService protocolService = new ProtocolService();
-    private final Scanner scanner = new Scanner(System.in);
-    private final UserStorage userStorage = new UserStorage(Path.of("users.json"));
-    private final UserService userService = new UserService(userStorage.load());
-
-    private final CliContext context =
-            new CliContext(
-                    sampleService,
-                    measurementService,
-                    protocolService,
-                    scanner,
-                    userStorage,
-                    userService
-            );
-
+    private final DbStorage dbStorage;
+    private final SampleService sampleService;
+    private final MeasurementService measurementService;
+    private final ProtocolService protocolService;
+    private final Scanner scanner;
+    private final UserService userService;
+    private final CliContext context;
     private final Map<String, CliCommand> commands = new LinkedHashMap<>();
 
     public LabCli() {
-        registerCommands();
+        this(null);
     }
 
     public LabCli(String[] args) {
+        this.dbStorage = createDbStorage();
+        this.sampleService = new SampleService(dbStorage);
+        this.measurementService = new MeasurementService(sampleService, dbStorage);
+        this.protocolService = new ProtocolService(dbStorage);
+        this.scanner = new Scanner(System.in);
+        this.userService = new UserService(loadUsers(), dbStorage);
+        this.context = new CliContext(
+                sampleService,
+                measurementService,
+                protocolService,
+                scanner,
+                userService
+        );
+
         registerCommands();
+        loadDataFromDatabase();
 
         if (args != null && args.length > 0) {
-            loadAtStartup(args[0]);
+            System.out.println("File autoload is disabled in DB mode; data is loaded from PostgreSQL.");
         }
     }
 
@@ -82,9 +83,6 @@ public class LabCli {
         register(new LoginCommand());
         register(new LogoutCommand());
         register(new WhoamiCommand());
-
-        register(new SaveCommand());
-        register(new LoadCommand());
 
         register(new SampleAddCommand());
         register(new SampleListCommand());
@@ -98,53 +96,66 @@ public class LabCli {
         register(new ProtApplyCommand());
     }
 
-    private void loadAtStartup(String filePath) {
+    private DbStorage createDbStorage() {
         try {
-            FileStorage fileStorage = new FileStorage();
-            FileValidator fileValidator = new FileValidator();
-
-            LabData data = fileStorage.load(Path.of(filePath));
-            fileValidator.validate(data);
-
-            TreeMap<Long, Sample> samples = data.getSamples().stream()
-                    .collect(Collectors.toMap(
-                            Sample::getId,
-                            Function.identity(),
-                            (a, b) -> a,
-                            TreeMap::new
-                    ));
-
-            TreeMap<Long, Measurement> measurements = data.getMeasurements().stream()
-                    .collect(Collectors.toMap(
-                            Measurement::getId,
-                            Function.identity(),
-                            (a, b) -> a,
-                            TreeMap::new
-                    ));
-
-            TreeMap<Long, Protocol> protocols = data.getProtocols().stream()
-                    .collect(Collectors.toMap(
-                            Protocol::getId,
-                            Function.identity(),
-                            (a, b) -> a,
-                            TreeMap::new
-                    ));
-
-            sampleService.replaceAll(samples);
-            measurementService.replaceAll(measurements);
-            protocolService.replaceAll(protocols);
-
-            System.out.println("OK loaded from " + filePath);
-        } catch (Exception e) {
-            System.out.println("Ошибка автозагрузки: " + e.getMessage());
-            System.out.println("Программа запущена без загруженных данных.");
+            DataBaseInitializer.init();
+            return new DbStorage();
+        } catch (Exception exception) {
+            System.out.println("DB mode is unavailable: " + exception.getMessage());
+            System.out.println("Application will continue in memory mode.");
+            return null;
         }
     }
 
+    private List<User> loadUsers() {
+        if (dbStorage == null) {
+            return new ArrayList<>();
+        }
+
+        return dbStorage.findAllUsers();
+    }
+
+    private void loadDataFromDatabase() {
+        if (dbStorage == null) {
+            return;
+        }
+
+        LabData data = dbStorage.loadLabData();
+
+        TreeMap<Long, Sample> samples = data.getSamples().stream()
+                .collect(Collectors.toMap(
+                        Sample::getId,
+                        Function.identity(),
+                        (left, right) -> left,
+                        TreeMap::new
+                ));
+
+        TreeMap<Long, Measurement> measurements = data.getMeasurements().stream()
+                .collect(Collectors.toMap(
+                        Measurement::getId,
+                        Function.identity(),
+                        (left, right) -> left,
+                        TreeMap::new
+                ));
+
+        TreeMap<Long, Protocol> protocols = data.getProtocols().stream()
+                .collect(Collectors.toMap(
+                        Protocol::getId,
+                        Function.identity(),
+                        (left, right) -> left,
+                        TreeMap::new
+                ));
+
+        sampleService.replaceAll(samples);
+        measurementService.replaceAll(measurements);
+        protocolService.replaceAll(protocols);
+    }
+
     public void start() {
-        System.out.println("Введите help для списка команд.");
+        System.out.println("Type help to show commands.");
 
         boolean running = true;
+
         while (running) {
             System.out.print("> ");
             String line = scanner.nextLine().trim();
@@ -155,8 +166,8 @@ public class LabCli {
 
             try {
                 running = processCommand(line);
-            } catch (Exception e) {
-                System.out.println("Ошибка: " + e.getMessage());
+            } catch (Exception exception) {
+                System.out.println("Error: " + exception.getMessage());
             }
         }
     }
@@ -170,8 +181,9 @@ public class LabCli {
         String commandName = parts[0].toLowerCase();
 
         CliCommand command = commands.get(commandName);
+
         if (command == null) {
-            throw new IllegalArgumentException("неизвестная команда");
+            throw new IllegalArgumentException("Unknown command");
         }
 
         return command.execute(parts, context);

@@ -9,7 +9,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import service.UserService;
-import storage.UserStorage;
 import ui.common.AlertUtils;
 
 import java.util.Optional;
@@ -21,7 +20,6 @@ public class AuthDialogs {
 
     public static void showRegisterDialog(
             UserService userService,
-            UserStorage userStorage,
             Runnable afterSuccess
     ) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -47,7 +45,6 @@ public class AuthDialogs {
                 String password = passwordField.getText().trim();
 
                 User user = userService.register(login, password);
-                userStorage.save(userService.getAllUsers());
 
                 System.out.println("OK user_id=" + user.getId());
                 afterSuccess.run();

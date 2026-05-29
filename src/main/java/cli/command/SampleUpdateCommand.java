@@ -15,7 +15,7 @@ public class SampleUpdateCommand implements CliCommand {
 
     @Override
     public boolean execute(String[] args, CliContext context) {
-        context.getUserService().requireLogin();
+        long actorId = context.getUserService().requireLogin().getId();
 
         if (args.length < 3) {
             throw new IllegalArgumentException("нужен id и field=value");
@@ -28,7 +28,7 @@ public class SampleUpdateCommand implements CliCommand {
             if (kv.length != 2) {
                 continue;
             }
-            context.getSampleService().update(id, kv[0], kv[1]);
+            context.getSampleService().update(id, kv[0], kv[1], actorId);
         }
 
         System.out.println("OK");
