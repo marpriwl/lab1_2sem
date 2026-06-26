@@ -5,6 +5,8 @@ import service.ProtocolService;
 import service.SampleService;
 import service.UserService;
 
+import service.history.HistoryService;
+
 import java.util.Scanner;
 
 public class CliContext {
@@ -13,19 +15,22 @@ public class CliContext {
     private final ProtocolService protocolService;
     private final Scanner scanner;
     private final UserService userService;
+    private final HistoryService historyService;
 
     public CliContext(
             SampleService sampleService,
             MeasurementService measurementService,
             ProtocolService protocolService,
             Scanner scanner,
-            UserService userService
+            UserService userService,
+            HistoryService historyService
     ) {
         this.sampleService = sampleService;
         this.measurementService = measurementService;
         this.protocolService = protocolService;
         this.userService = userService;
         this.scanner = scanner;
+        this.historyService = historyService;
     }
 
     public SampleService getSampleService() {
@@ -46,5 +51,9 @@ public class CliContext {
 
     public UserService getUserService() {
         return userService;
+    }
+
+    public HistoryService getHistoryService() {
+        return historyService;
     }
 }

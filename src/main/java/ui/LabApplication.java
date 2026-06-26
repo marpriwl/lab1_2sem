@@ -18,7 +18,9 @@ import service.ProtocolService;
 import service.SampleService;
 import service.ServiceContext;
 import service.UserService;
+import service.history.HistoryService;
 import ui.auth.AuthDialogs;
+import ui.common.AlertUtils;
 import ui.measurement.MeasurementPanel;
 import ui.protocol.ProtocolPanel;
 import ui.sample.SamplePanel;
@@ -31,6 +33,7 @@ public class LabApplication extends Application {
     private final MeasurementService measurementService = ServiceContext.getMeasurementService();
     private final ProtocolService protocolService = ServiceContext.getProtocolService();
     private final UserService userService = ServiceContext.getUserService();
+    private final HistoryService historyService = ServiceContext.getHistoryService();
 
     @Override
     public void start(Stage stage) {
@@ -56,6 +59,9 @@ public class LabApplication extends Application {
         Button registerButton = new Button("Register");
         Button loginButton = new Button("Login");
         Button logoutButton = new Button("Logout");
+        
+        Button undoButton = new Button("Undo");
+        Button redoButton = new Button("Redo");
 
         Label authLabel = new Label();
 
@@ -82,13 +88,39 @@ public class LabApplication extends Application {
                 logoutButton,
                 samplesButton,
                 measurementsButton,
-                protocolsButton
+                protocolsButton,
+                undoButton,
+                redoButton
         );
         topPanel.setPadding(new Insets(0, 0, 12, 0));
 
         SamplePanel samplePanel = new SamplePanel(sampleService, userService);
         MeasurementPanel measurementPanel = new MeasurementPanel(measurementService, userService);
         ProtocolPanel protocolPanel = new ProtocolPanel(protocolService, measurementService, userService);
+
+        undoButton.setOnAction(event -> {
+            try {
+                String result = historyService.undo();
+                samplePanel.refresh();
+                measurementPanel.refresh();
+                protocolPanel.refresh();
+                System.out.println(result);
+            } catch (IllegalStateException e) {
+                AlertUtils.showError("History", e.getMessage());
+            }
+        });
+
+        redoButton.setOnAction(event -> {
+            try {
+                String result = historyService.redo();
+                samplePanel.refresh();
+                measurementPanel.refresh();
+                protocolPanel.refresh();
+                System.out.println(result);
+            } catch (IllegalStateException e) {
+                AlertUtils.showError("History", e.getMessage());
+            }
+        });
 
         registerButton.setOnAction(event ->
                 AuthDialogs.showRegisterDialog(

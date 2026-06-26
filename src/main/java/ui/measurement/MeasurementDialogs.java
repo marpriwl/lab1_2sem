@@ -1,5 +1,6 @@
 package ui.measurement;
 
+import domain.Measurement;
 import domain.MeasurementParam;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
@@ -8,9 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import service.MeasurementService;
+import service.ServiceContext;
 import ui.common.AlertUtils;
 import validation.MeasurementValidator;
 import service.UserService;
+import service.history.operations.AddMeasurementOperation;
 
 import java.util.Optional;
 
@@ -77,7 +80,12 @@ public class MeasurementDialogs {
 
                 long ownerId = userService.requireLogin().getId();
 
-                measurementService.add(sampleId, param, value, unit, method, ownerId);
+                long id = measurementService.add(sampleId, param, value, unit, method, ownerId);
+                Measurement measurement = measurementService.getById(id);
+                ServiceContext.getHistoryService().addOperation(
+                        new AddMeasurementOperation(measurementService, measurement)
+                );
+                
                 afterSuccess.run();
             } catch (Exception e) { //ловим ошибку
                 AlertUtils.showError(e.getMessage());

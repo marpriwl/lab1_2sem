@@ -37,6 +37,14 @@ public class ProtocolService {
         return id;
     }
 
+    public Protocol getById(long id) {
+        Protocol protocol = protocols.get(id);
+        if (protocol == null) {
+            throw new IllegalArgumentException("Protocol id=" + id + " was not found");
+        }
+        return protocol;
+    }
+
     public String apply(long protocolId, long sampleId, MeasurementService measService) {
         Protocol protocol = protocols.get(protocolId);
 
@@ -60,6 +68,20 @@ public class ProtocolService {
         return "Missing params: " + missing.stream()
                 .map(Enum::name)
                 .collect(Collectors.joining(", "));
+    }
+
+    public void delete(long id) {
+        protocols.remove(id);
+        if (dbStorage != null) {
+            dbStorage.deleteProtocol(id);
+        }
+    }
+
+    public void restore(Protocol protocol) {
+        protocols.put(protocol.getId(), protocol);
+        if (dbStorage != null) {
+            dbStorage.insertProtocol(protocol);
+        }
     }
 
     public void replaceAll(TreeMap<Long, Protocol> loadedProtocols) {

@@ -1,7 +1,9 @@
 package cli.command;
 
 import cli.CliContext;
+import domain.Measurement;
 import domain.MeasurementParam;
+import service.history.operations.AddMeasurementOperation;
 import validation.MeasurementValidator;
 
 public class MeasAddCommand implements CliCommand {
@@ -53,6 +55,9 @@ public class MeasAddCommand implements CliCommand {
         MeasurementValidator.validateMethod(method);
 
         long id = context.getMeasurementService().add(sampleId, param, value, unit, method, ownerId);
+        Measurement measurement = context.getMeasurementService().getById(id);
+        context.getHistoryService().addOperation(new AddMeasurementOperation(context.getMeasurementService(), measurement));
+
         System.out.println("OK measurement_id=" + id);
         return true;
     }

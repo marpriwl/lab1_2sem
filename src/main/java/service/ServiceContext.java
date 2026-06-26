@@ -8,6 +8,8 @@ import domain.User;
 import storage.DbStorage;
 import storage.LabData;
 
+import service.history.HistoryService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -24,6 +26,7 @@ public final class ServiceContext {
 
     private static final ProtocolService protocolService = new ProtocolService(dbStorage);
     private static final UserService userService = new UserService(loadUsers(), dbStorage);
+    private static final HistoryService historyService = new HistoryService();
 
     static {
         refreshFromDatabase();
@@ -46,6 +49,10 @@ public final class ServiceContext {
 
     public static UserService getUserService() {
         return userService;
+    }
+
+    public static HistoryService getHistoryService() {
+        return historyService;
     }
 
     public static boolean isDatabaseMode() {

@@ -1,6 +1,8 @@
 package cli.command;
 
 import cli.CliContext;
+import domain.Sample;
+import service.history.operations.UpdateSampleOperation;
 
 public class SampleUpdateCommand implements CliCommand {
     @Override
@@ -28,10 +30,29 @@ public class SampleUpdateCommand implements CliCommand {
             if (kv.length != 2) {
                 continue;
             }
-            context.getSampleService().update(id, kv[0], kv[1], actorId);
+            String field = kv[0].toLowerCase();
+            String newValue = kv[1];
+            
+            Sample sample = context.getSampleService().getById(id);
+            String oldValue = getFieldValue(sample, field);
+            
+            context.getSampleService().update(id, field, newValue, actorId);
+            context.getHistoryService().addOperation(
+                    new UpdateSampleOperation(context.getSampleService(), id, field, oldValue, newValue, actorId)
+            );
         }
 
         System.out.println("OK");
         return true;
+    }
+
+    private String getFieldValue(Sample sample, String field) {
+        return switch (field) {
+            case "name" -> sample.getName();
+            case "type" -> sample.getType();
+            case "location" -> sample.getLocation();
+            case "status" -> sample.getStatus().name();
+            default -> throw new IllegalArgumentException("Unknown field: " + field);
+        };
     }
 }

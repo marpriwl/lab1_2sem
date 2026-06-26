@@ -1,5 +1,8 @@
 package cli;
 
+import service.history.HistoryService;
+import cli.command.UndoCommand;
+import cli.command.RedoCommand;
 import cli.command.CliCommand;
 import cli.command.ExitCommand;
 import cli.command.HelpCommand;
@@ -25,6 +28,7 @@ import domain.User;
 import service.MeasurementService;
 import service.ProtocolService;
 import service.SampleService;
+import service.ServiceContext;
 import service.UserService;
 import storage.DbStorage;
 import storage.LabData;
@@ -45,6 +49,7 @@ public class LabCli {
     private final ProtocolService protocolService;
     private final Scanner scanner;
     private final UserService userService;
+    private final HistoryService historyService;
     private final CliContext context;
     private final Map<String, CliCommand> commands = new LinkedHashMap<>();
 
@@ -54,21 +59,22 @@ public class LabCli {
 
     public LabCli(String[] args) {
         this.dbStorage = createDbStorage();
-        this.sampleService = new SampleService(dbStorage);
-        this.measurementService = new MeasurementService(sampleService, dbStorage);
-        this.protocolService = new ProtocolService(dbStorage);
+        this.sampleService = ServiceContext.getSampleService();
+        this.measurementService = ServiceContext.getMeasurementService();
+        this.protocolService = ServiceContext.getProtocolService();
         this.scanner = new Scanner(System.in);
-        this.userService = new UserService(loadUsers(), dbStorage);
+        this.userService = ServiceContext.getUserService();
+        this.historyService = ServiceContext.getHistoryService();
         this.context = new CliContext(
                 sampleService,
                 measurementService,
                 protocolService,
                 scanner,
-                userService
+                userService,
+                historyService
         );
 
         registerCommands();
-        loadDataFromDatabase();
 
         if (args != null && args.length > 0) {
             System.out.println("File autoload is disabled in DB mode; data is loaded from PostgreSQL.");
@@ -94,6 +100,9 @@ public class LabCli {
         register(new MeasStatsCommand());
         register(new ProtCreateCommand());
         register(new ProtApplyCommand());
+
+        register(new UndoCommand());
+        register(new RedoCommand());
     }
 
     private DbStorage createDbStorage() {
@@ -113,42 +122,6 @@ public class LabCli {
         }
 
         return dbStorage.findAllUsers();
-    }
-
-    private void loadDataFromDatabase() {
-        if (dbStorage == null) {
-            return;
-        }
-
-        LabData data = dbStorage.loadLabData();
-
-        TreeMap<Long, Sample> samples = data.getSamples().stream()
-                .collect(Collectors.toMap(
-                        Sample::getId,
-                        Function.identity(),
-                        (left, right) -> left,
-                        TreeMap::new
-                ));
-
-        TreeMap<Long, Measurement> measurements = data.getMeasurements().stream()
-                .collect(Collectors.toMap(
-                        Measurement::getId,
-                        Function.identity(),
-                        (left, right) -> left,
-                        TreeMap::new
-                ));
-
-        TreeMap<Long, Protocol> protocols = data.getProtocols().stream()
-                .collect(Collectors.toMap(
-                        Protocol::getId,
-                        Function.identity(),
-                        (left, right) -> left,
-                        TreeMap::new
-                ));
-
-        sampleService.replaceAll(samples);
-        measurementService.replaceAll(measurements);
-        protocolService.replaceAll(protocols);
     }
 
     public void start() {

@@ -8,9 +8,13 @@ public class AlertUtils {  //AlertUtils — это вспомогательны�
     }
 
     public static void showError(String message) {
+        showError("Error", message);
+    }
+
+    public static void showError(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);  //Создаем окно ошибки
         alert.setTitle("Error"); //Заголовок окна
-        alert.setHeaderText("Operation failed"); //Крупный заголовок внутри окна
+        alert.setHeaderText(header); //Крупный заголовок внутри окна
         alert.setContentText(message);  //Основной текст ошибки (от валидатора)
         alert.showAndWait(); //Показать окно и ждать закрытия
     }

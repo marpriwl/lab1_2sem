@@ -9,7 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import service.SampleService;
+import service.ServiceContext;
 import service.UserService;
+import service.history.operations.AddSampleOperation;
+import service.history.operations.ArchiveSampleOperation;
+import service.history.operations.UpdateSampleOperation;
 import ui.common.AlertUtils;
 import validation.SampleValidator;
 
@@ -46,11 +50,16 @@ public class SampleDialogs {
             try {
                 long ownerId = userService.requireLogin().getId();
 
-                sampleService.add(
+                long id = sampleService.add(
                         nameField.getText().trim(),
                         typeField.getText().trim(),
                         locationField.getText().trim(),
                         ownerId
+                );
+
+                Sample sample = sampleService.getById(id);
+                ServiceContext.getHistoryService().addOperation(
+                        new AddSampleOperation(sampleService, sample)
                 );
 
                 afterSuccess.run();
@@ -87,9 +96,28 @@ public class SampleDialogs {
                 SampleValidator.validate(name, type, location);
 
                 long actorId = userService.requireLogin().getId();
-                sampleService.update(sample.getId(), "name", name, actorId);
-                sampleService.update(sample.getId(), "type", type, actorId);
-                sampleService.update(sample.getId(), "location", location, actorId);
+                
+                if (!name.equals(sample.getName())) {
+                    String oldName = sample.getName();
+                    sampleService.update(sample.getId(), "name", name, actorId);
+                    ServiceContext.getHistoryService().addOperation(
+                            new UpdateSampleOperation(sampleService, sample.getId(), "name", oldName, name, actorId)
+                    );
+                }
+                if (!type.equals(sample.getType())) {
+                    String oldType = sample.getType();
+                    sampleService.update(sample.getId(), "type", type, actorId);
+                    ServiceContext.getHistoryService().addOperation(
+                            new UpdateSampleOperation(sampleService, sample.getId(), "type", oldType, type, actorId)
+                    );
+                }
+                if (!location.equals(sample.getLocation())) {
+                    String oldLoc = sample.getLocation();
+                    sampleService.update(sample.getId(), "location", location, actorId);
+                    ServiceContext.getHistoryService().addOperation(
+                            new UpdateSampleOperation(sampleService, sample.getId(), "location", oldLoc, location, actorId)
+                    );
+                }
 
                 afterSuccess.run();
             } catch (Exception exception) {
@@ -125,6 +153,9 @@ public class SampleDialogs {
             try {
                 long actorId = userService.requireLogin().getId();
                 sampleService.archive(sample.getId(), actorId);
+                ServiceContext.getHistoryService().addOperation(
+                        new ArchiveSampleOperation(sampleService, sample.getId(), actorId)
+                );
                 afterSuccess.run();
             } catch (Exception exception) {
                 AlertUtils.showError(exception.getMessage());

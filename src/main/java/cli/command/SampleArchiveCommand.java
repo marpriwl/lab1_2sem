@@ -1,6 +1,7 @@
 package cli.command;
 
 import cli.CliContext;
+import service.history.operations.ArchiveSampleOperation;
 
 public class SampleArchiveCommand implements CliCommand {
     @Override
@@ -23,6 +24,8 @@ public class SampleArchiveCommand implements CliCommand {
 
         long id = Long.parseLong(args[1]);
         context.getSampleService().archive(id, actorId);
+        context.getHistoryService().addOperation(new ArchiveSampleOperation(context.getSampleService(), id, actorId));
+        
         System.out.println("OK sample " + id + " archived");
         return true;
     }

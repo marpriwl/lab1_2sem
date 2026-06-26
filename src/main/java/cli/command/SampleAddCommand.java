@@ -1,6 +1,8 @@
 package cli.command;
 
 import cli.CliContext;
+import domain.Sample;
+import service.history.operations.AddSampleOperation;
 import validation.SampleValidator;
 
 public class SampleAddCommand implements CliCommand {
@@ -31,6 +33,9 @@ public class SampleAddCommand implements CliCommand {
         SampleValidator.validateLocation(location);
 
         long id = context.getSampleService().add(name, type, location, ownerId);
+        Sample sample = context.getSampleService().getById(id);
+        context.getHistoryService().addOperation(new AddSampleOperation(context.getSampleService(), sample));
+
         System.out.println("OK sample_id=" + id);
         return true;
     }

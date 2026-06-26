@@ -53,6 +53,14 @@ public class MeasurementService {
         return id;
     }
 
+    public Measurement getById(long id) {
+        Measurement measurement = measurements.get(id);
+        if (measurement == null) {
+            throw new IllegalArgumentException("Measurement id=" + id + " was not found");
+        }
+        return measurement;
+    }
+
     public String list(long sampleId, MeasurementParam paramFilter, int lastN) {
         sampleService.getById(sampleId);
 
@@ -96,6 +104,20 @@ public class MeasurementService {
         double avg = list.stream().mapToDouble(Measurement::getValue).average().orElse(0);
 
         return String.format("count: %d%nmin: %.3f%nmax: %.3f%navg: %.3f", list.size(), min, max, avg);
+    }
+
+    public void delete(long id) {
+        measurements.remove(id);
+        if (dbStorage != null) {
+            dbStorage.deleteMeasurement(id);
+        }
+    }
+
+    public void restore(Measurement measurement) {
+        measurements.put(measurement.getId(), measurement);
+        if (dbStorage != null) {
+            dbStorage.insertMeasurement(measurement);
+        }
     }
 
     public void replaceAll(TreeMap<Long, Measurement> loadedMeasurements) {

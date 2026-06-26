@@ -127,6 +127,20 @@ public class SampleService {
         }
     }
 
+    public void delete(long id) {
+        samples.remove(id);
+        if (dbStorage != null) {
+            dbStorage.deleteSample(id);
+        }
+    }
+
+    public void restore(Sample sample) {
+        samples.put(sample.getId(), sample);
+        if (dbStorage != null) {
+            dbStorage.insertSample(sample);
+        }
+    }
+
     public void replaceAll(TreeMap<Long, Sample> loadedSamples) {
         samples.clear();
         samples.putAll(loadedSamples);

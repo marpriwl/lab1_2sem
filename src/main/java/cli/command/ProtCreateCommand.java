@@ -2,6 +2,8 @@ package cli.command;
 
 import cli.CliContext;
 import domain.MeasurementParam;
+import domain.Protocol;
+import service.history.operations.CreateProtocolOperation;
 import validation.ProtocolValidator;
 
 import java.util.Set;
@@ -31,6 +33,9 @@ public class ProtCreateCommand implements CliCommand {
         );
 
         long id = context.getProtocolService().create(name, params, ownerId);
+        Protocol protocol = context.getProtocolService().getById(id);
+        context.getHistoryService().addOperation(new CreateProtocolOperation(context.getProtocolService(), protocol));
+
         System.out.println("OK protocol_id=" + id);
         return true;
     }

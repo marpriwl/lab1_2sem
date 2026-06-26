@@ -1,5 +1,6 @@
 package ui.protocol;
 
+import domain.Protocol;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -9,6 +10,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import service.MeasurementService;
 import service.ProtocolService;
+import service.ServiceContext;
+import service.history.operations.CreateProtocolOperation;
 import ui.common.AlertUtils;
 import validation.ProtocolValidator;
 import service.UserService;
@@ -47,10 +50,15 @@ public class ProtocolDialogs {
                 String name = nameField.getText().trim();
                 long ownerId = userService.requireLogin().getId();
 
-                protocolService.create(
+                long id = protocolService.create(
                         name,
                         ProtocolValidator.parseParams(paramsField.getText()),
                         ownerId
+                );
+
+                Protocol protocol = protocolService.getById(id);
+                ServiceContext.getHistoryService().addOperation(
+                        new CreateProtocolOperation(protocolService, protocol)
                 );
 
                 afterSuccess.run();
